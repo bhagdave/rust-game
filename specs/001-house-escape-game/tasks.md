@@ -755,7 +755,7 @@ fn pressure_plate_puzzle_unlocks_door() {
 
 ---
 
-### T021: [P] Unit test: Candle wax depletion
+### T021: [X] Unit test: Candle wax depletion
 **File**: `tests/unit/candle_burn_test.rs`
 **Description**: Test candle wax decreases over time when lit.
 
