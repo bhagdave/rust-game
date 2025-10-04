@@ -573,7 +573,7 @@ Note: To receive ActionState<PlayerAction> in systems (e.g., T024), spawn the pl
 
 ---
 
-### T015: [P] Implement MapState resource
+### T015: [X] Implement MapState resource
 **File**: `src/resources/map_state.rs`
 **Description**: Define MapState for tracking explored rooms.
 
