@@ -700,7 +700,7 @@ fn player_dies_on_trap_and_respawns() {
 
 ---
 
-### T018: [P] Integration test: Save and load game state
+### T018: [X] Integration test: Save and load game state
 **File**: `tests/integration/save_load.rs`
 **Description**: Test auto-save on room entry, load restores state.
 
