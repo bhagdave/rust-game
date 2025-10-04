@@ -224,7 +224,7 @@ pub struct LightSource {
 
 ---
 
-### T008: [P] Implement Inventory components
+### T008: [X] Implement Inventory components
 **File**: `src/components/inventory.rs`
 **Description**: Define Inventory, Item, StackableItem, Collectible.
 
