@@ -404,7 +404,7 @@ pub enum HazardEffect {
 
 ---
 
-### T012: [P] Implement Puzzle components
+### T012: [X] Implement Puzzle components
 **File**: `src/components/puzzle.rs`
 **Description**: Define Puzzle, PuzzleState, PuzzleReward, puzzle-specific sub-components.
 
