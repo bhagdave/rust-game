@@ -114,7 +114,7 @@ fn main() {
 
 ---
 
-### T004: [P] Create lib.rs for testability
+### T004: [X] Create lib.rs for testability
 **File**: `src/lib.rs`
 **Description**: Create library root exposing modules for integration testing.
 
