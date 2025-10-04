@@ -187,7 +187,7 @@ pub enum Health {
 
 ---
 
-### T007: [P] Implement Candle and Lighting components
+### T007: [X] Implement Candle and Lighting components
 **File**: `src/components/lighting.rs`
 **Description**: Define Candle, CandleWax, CandleState, VisibilityRadius, LightSource.
 
