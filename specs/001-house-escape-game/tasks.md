@@ -892,9 +892,10 @@ pub fn player_movement_system(
 
 ---
 
-### T025: Implement CandleBurnSystem
+### T025: [X] ✅ Implement CandleBurnSystem - COMPLETED
 **File**: `src/systems/candle_burn.rs`
 **Description**: System for candle wax depletion, state transitions.
+**Status**: ✅ COMPLETED - All T021 integration tests pass (7/7)
 
 ```rust
 use bevy::prelude::*;
@@ -933,7 +934,7 @@ pub fn candle_burn_system(
 }
 ```
 
-**Acceptance**: System compiles, candle wax depletes, test T021 passes.
+**Acceptance**: ✅ System compiles, candle wax depletes, test T021 passes (all 7 tests).
 
 ---
 
