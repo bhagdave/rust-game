@@ -52,6 +52,22 @@ pub struct Collider {
     pub max: Vec2,
 }
 
+#[derive(Component)]
+pub struct Door;
+
+#[derive(Component, Debug, PartialEq)]
+pub enum DoorState {
+    Locked(KeyType),
+    Unlocked,
+    Open,
+}
+
+#[derive(Component)]
+pub struct TargetRoom(pub RoomId);
+
+#[derive(Component)]
+pub struct Interactable; // marker for player interaction
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -178,5 +194,129 @@ mod tests {
         let room_connections = app.world().get::<RoomConnections>(entity);
         assert!(room_connections.is_some());
         assert_eq!(room_connections.unwrap().0.len(), 2);
+    }
+
+    #[test]
+    fn can_create_door_entity() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+
+        // Spawn door entity with components
+        let entity = app
+            .world_mut()
+            .spawn((
+                Door,
+                DoorState::Locked(KeyType::Brass),
+                TargetRoom(1),
+                Interactable,
+            ))
+            .id();
+
+        // Verify door components
+        let door = app.world().get::<Door>(entity);
+        assert!(door.is_some());
+
+        let door_state = app.world().get::<DoorState>(entity);
+        assert!(door_state.is_some());
+        assert_eq!(*door_state.unwrap(), DoorState::Locked(KeyType::Brass));
+
+        let target = app.world().get::<TargetRoom>(entity);
+        assert!(target.is_some());
+        assert_eq!(target.unwrap().0, 1);
+
+        let interactable = app.world().get::<Interactable>(entity);
+        assert!(interactable.is_some());
+    }
+
+    #[test]
+    fn door_state_transitions() {
+        // Test state machine transitions
+        let locked = DoorState::Locked(KeyType::Brass);
+        let unlocked = DoorState::Unlocked;
+        let open = DoorState::Open;
+
+        // Test equality
+        assert_eq!(locked, DoorState::Locked(KeyType::Brass));
+        assert_eq!(unlocked, DoorState::Unlocked);
+        assert_eq!(open, DoorState::Open);
+
+        // Test inequality
+        assert_ne!(locked, unlocked);
+        assert_ne!(unlocked, open);
+        assert_ne!(locked, open);
+    }
+
+    #[test]
+    fn door_state_with_different_keys() {
+        let brass_locked = DoorState::Locked(KeyType::Brass);
+        let iron_locked = DoorState::Locked(KeyType::Iron);
+        let ornate_locked = DoorState::Locked(KeyType::Ornate);
+        let master_locked = DoorState::Locked(KeyType::Master);
+
+        // Each key type creates a different locked state
+        assert_ne!(brass_locked, iron_locked);
+        assert_ne!(iron_locked, ornate_locked);
+        assert_ne!(ornate_locked, master_locked);
+        assert_ne!(master_locked, brass_locked);
+
+        // Same key type should be equal
+        assert_eq!(brass_locked, DoorState::Locked(KeyType::Brass));
+    }
+
+    #[test]
+    fn door_target_room_component() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+
+        // Test various room IDs
+        let entity1 = app.world_mut().spawn(TargetRoom(0)).id();
+        let entity2 = app.world_mut().spawn(TargetRoom(5)).id();
+        let entity3 = app.world_mut().spawn(TargetRoom(99)).id();
+
+        assert_eq!(app.world().get::<TargetRoom>(entity1).unwrap().0, 0);
+        assert_eq!(app.world().get::<TargetRoom>(entity2).unwrap().0, 5);
+        assert_eq!(app.world().get::<TargetRoom>(entity3).unwrap().0, 99);
+    }
+
+    #[test]
+    fn interactable_marker_component() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+
+        // Interactable is just a marker - test it can be added
+        let entity = app.world_mut().spawn(Interactable).id();
+
+        let interactable = app.world().get::<Interactable>(entity);
+        assert!(interactable.is_some());
+    }
+
+    #[test]
+    fn door_state_machine_scenario() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+
+        // Create a locked door
+        let entity = app
+            .world_mut()
+            .spawn((Door, DoorState::Locked(KeyType::Brass), TargetRoom(1)))
+            .id();
+
+        // Verify initial state
+        let state = app.world().get::<DoorState>(entity);
+        assert_eq!(*state.unwrap(), DoorState::Locked(KeyType::Brass));
+
+        // Simulate unlocking (would be done by a system)
+        app.world_mut()
+            .entity_mut(entity)
+            .insert(DoorState::Unlocked);
+
+        let state = app.world().get::<DoorState>(entity);
+        assert_eq!(*state.unwrap(), DoorState::Unlocked);
+
+        // Simulate opening (would be done by a system)
+        app.world_mut().entity_mut(entity).insert(DoorState::Open);
+
+        let state = app.world().get::<DoorState>(entity);
+        assert_eq!(*state.unwrap(), DoorState::Open);
     }
 }
