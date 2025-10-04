@@ -89,7 +89,7 @@ touch src/audio/mod.rs
 
 ---
 
-### T003: [P] Create main.rs with Bevy app boilerplate
+### T003: [X] Create main.rs with Bevy app boilerplate
 **File**: `src/main.rs`
 **Description**: Initialize Bevy app with DefaultPlugins, window configuration, and plugin setup structure.
 
