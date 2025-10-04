@@ -807,7 +807,7 @@ fn inventory_enforces_capacity() {
 
 ---
 
-### T023: [P] Unit test: Puzzle logic
+### T023: [X] ✅ Unit test: Puzzle logic
 **File**: `tests/unit/puzzle_logic_test.rs`
 **Description**: Test symbol match puzzle validation.
 
