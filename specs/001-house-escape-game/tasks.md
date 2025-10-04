@@ -665,7 +665,7 @@ pub enum FontType {
 
 **CRITICAL**: Write these tests BEFORE implementing systems. Tests MUST FAIL initially.
 
-### T017: [P] Integration test: Player death and respawn
+### T017: [X] Integration test: Player death and respawn
 **File**: `tests/integration/player_death_respawn.rs`
 **Description**: Test scenario from quickstart.md - player dies on trap, respawns at checkpoint with inventory intact.
 
