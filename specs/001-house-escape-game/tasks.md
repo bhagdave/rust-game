@@ -614,7 +614,7 @@ impl MapState {
 
 ---
 
-### T016: [P] Implement AssetHandles resource
+### T016: [X] Implement AssetHandles resource
 **File**: `src/resources/asset_handles.rs`
 **Description**: Define AssetHandles for texture, audio, font handles.
 
