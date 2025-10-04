@@ -1,8 +1,17 @@
-use bevy::prelude::*;
 use crate::components::player::*;
-use crate::resources::game_state::{GameState, GameMode};
+use crate::resources::game_state::{GameMode, GameState};
 use crate::resources::input_config::PlayerAction;
+use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
+
+/// Query type for player movement system to reduce type complexity
+type PlayerMovementQuery<'a> = (
+    &'a mut Transform,
+    &'a mut Velocity,
+    &'a mut JumpState,
+    &'a ActionState<PlayerAction>,
+    Option<&'a DoubleJumpUnlocked>,
+);
 
 /// System for player movement, jump physics, and horizontal velocity
 ///
@@ -17,24 +26,14 @@ use leafwing_input_manager::prelude::*;
 pub fn player_movement_system(
     time: Res<Time>,
     game_state: Res<GameState>,
-    mut query: Query<
-        (
-            &mut Transform,
-            &mut Velocity,
-            &mut JumpState,
-            &ActionState<PlayerAction>,
-            Option<&DoubleJumpUnlocked>,
-        ),
-        With<Player>,
-    >,
+    mut query: Query<PlayerMovementQuery, With<Player>>,
 ) {
     // Don't process movement if game is not in Playing mode (paused, menu, etc.)
     if game_state.game_mode != GameMode::Playing {
         return;
     }
 
-    for (mut transform, mut velocity, mut jump_state, actions, double_jump_unlocked) in &mut query
-    {
+    for (mut transform, mut velocity, mut jump_state, actions, double_jump_unlocked) in &mut query {
         // Horizontal movement
         let mut move_dir = 0.0;
         if actions.pressed(&PlayerAction::MoveLeft) {
@@ -114,7 +113,6 @@ mod tests {
     // more complex setup with plugin systems. These tests verify the system compiles
     // and that game modes are respected. Full input testing is done via integration tests.
 
-
     #[test]
     fn paused_game_stops_movement() {
         let mut app = App::new();
@@ -146,7 +144,10 @@ mod tests {
 
         // Set action as pressed
         {
-            let mut action_state = app.world_mut().get_mut::<ActionState<PlayerAction>>(player_entity).unwrap();
+            let mut action_state = app
+                .world_mut()
+                .get_mut::<ActionState<PlayerAction>>(player_entity)
+                .unwrap();
             action_state.press(&PlayerAction::MoveRight);
         }
 
@@ -164,6 +165,9 @@ mod tests {
             transform.translation.x
         };
 
-        assert_eq!(final_x, initial_x, "Player should not move when game is paused");
+        assert_eq!(
+            final_x, initial_x,
+            "Player should not move when game is paused"
+        );
     }
 }
