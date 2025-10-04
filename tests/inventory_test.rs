@@ -46,7 +46,11 @@ fn inventory_stacks_matches() {
     // Assert: Initial inventory has 1 match
     {
         let inventory = app.world().get::<Inventory>(player_entity).unwrap();
-        assert_eq!(inventory.items.len(), 1, "Inventory should start with 1 item");
+        assert_eq!(
+            inventory.items.len(),
+            1,
+            "Inventory should start with 1 item"
+        );
         assert!(
             matches!(inventory.items[0], Item::Match),
             "First item should be a match"
@@ -70,7 +74,10 @@ fn inventory_stacks_matches() {
     //     assert!(!match_exists, "Match should be removed from world after pickup");
     // }
 
-    assert!(false, "Test not yet implemented - InventoryCollectionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - InventoryCollectionSystem needed"
+    );
 }
 
 /// Unit test: Inventory enforces capacity limit
@@ -152,7 +159,10 @@ fn inventory_enforces_capacity() {
     // TODO: Assert - UI message displayed (optional check)
     // Verify InventoryFullEvent emitted or UI notification component added
 
-    assert!(false, "Test not yet implemented - InventoryCollectionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - InventoryCollectionSystem needed"
+    );
 }
 
 /// Unit test: Unique items occupy separate inventory slots

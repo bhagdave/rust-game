@@ -66,7 +66,10 @@ fn symbol_puzzle_validates_correct_sequence() {
     //     }
     // }
 
-    assert!(false, "Test not yet implemented - PuzzleInteractionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - PuzzleInteractionSystem needed"
+    );
 }
 
 /// Unit test: Symbol match puzzle rejects incorrect sequence
@@ -117,7 +120,10 @@ fn symbol_puzzle_rejects_incorrect_sequence() {
     //     }
     // }
 
-    assert!(false, "Test not yet implemented - PuzzleInteractionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - PuzzleInteractionSystem needed"
+    );
 }
 
 /// Unit test: Symbol puzzle tracks partial progress
@@ -176,7 +182,10 @@ fn symbol_puzzle_tracks_partial_progress() {
     //     }
     // }
 
-    assert!(false, "Test not yet implemented - PuzzleInteractionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - PuzzleInteractionSystem needed"
+    );
 }
 
 /// Unit test: Symbol puzzle resets on wrong symbol
@@ -222,7 +231,10 @@ fn symbol_puzzle_resets_on_wrong_symbol() {
     //     }
     // }
 
-    assert!(false, "Test not yet implemented - PuzzleInteractionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - PuzzleInteractionSystem needed"
+    );
 }
 
 /// Unit test: Empty correct sequence edge case
@@ -323,7 +335,10 @@ fn symbol_puzzle_single_symbol_sequence() {
     //     assert_eq!(*state, PuzzleState::Solved, "Single symbol should solve immediately");
     // }
 
-    assert!(false, "Test not yet implemented - PuzzleInteractionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - PuzzleInteractionSystem needed"
+    );
 }
 
 /// Unit test: Long symbol sequence
@@ -379,7 +394,10 @@ fn symbol_puzzle_long_sequence() {
     //     assert_eq!(*state, PuzzleState::Solved, "Long sequence should solve when all correct");
     // }
 
-    assert!(false, "Test not yet implemented - PuzzleInteractionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - PuzzleInteractionSystem needed"
+    );
 }
 
 /// Unit test: Multiple puzzle instances
@@ -434,7 +452,10 @@ fn multiple_symbol_puzzles_independent() {
     //     assert_eq!(*state2, PuzzleState::Unsolved, "Puzzle 2 should remain unsolved");
     // }
 
-    assert!(false, "Test not yet implemented - PuzzleInteractionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - PuzzleInteractionSystem needed"
+    );
 }
 
 /// Unit test: All symbol types in sequence
@@ -488,5 +509,8 @@ fn symbol_puzzle_all_symbol_types() {
     //     assert_eq!(*state, PuzzleState::Solved, "All symbol types should be validated");
     // }
 
-    assert!(false, "Test not yet implemented - PuzzleInteractionSystem needed");
+    assert!(
+        false,
+        "Test not yet implemented - PuzzleInteractionSystem needed"
+    );
 }

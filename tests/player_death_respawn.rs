@@ -1,7 +1,7 @@
 use bevy::prelude::*;
+use rust_game::components::inventory::*;
 use rust_game::components::player::*;
 use rust_game::components::trap::*;
-use rust_game::components::inventory::*;
 use rust_game::resources::game_state::*;
 
 #[test]

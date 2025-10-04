@@ -1,7 +1,7 @@
 use bevy::prelude::*;
-use rust_game::components::player::*;
 use rust_game::components::inventory::*;
 use rust_game::components::lighting::*;
+use rust_game::components::player::*;
 use rust_game::resources::game_state::*;
 use rust_game::resources::map_state::*;
 
@@ -67,7 +67,10 @@ fn auto_save_on_room_transition() {
         let map_state = app.world().resource::<MapState>();
         let room_0_status = map_state.explored_rooms.get(&0);
         assert!(room_0_status.is_some(), "Room 0 should be in map");
-        assert!(room_0_status.unwrap().visited, "Room 0 should be marked as visited");
+        assert!(
+            room_0_status.unwrap().visited,
+            "Room 0 should be marked as visited"
+        );
     }
 
     // TODO: Act - Transition to room B (room 1)

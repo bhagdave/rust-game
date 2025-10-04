@@ -1,6 +1,6 @@
-use bevy::prelude::*;
 use crate::components::inventory::Item;
 use crate::components::room::RoomId;
+use bevy::prelude::*;
 
 #[derive(Component)]
 pub enum Puzzle {
@@ -77,11 +77,7 @@ mod tests {
 
         let entity = app
             .world_mut()
-            .spawn((
-                puzzle,
-                PuzzleState::Unsolved,
-                PuzzleReward::UnlockDoor(1),
-            ))
+            .spawn((puzzle, PuzzleState::Unsolved, PuzzleReward::UnlockDoor(1)))
             .id();
 
         // Verify puzzle components

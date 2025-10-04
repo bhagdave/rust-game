@@ -1,5 +1,5 @@
-use bevy::prelude::*;
 use crate::components::inventory::KeyType;
+use bevy::prelude::*;
 
 pub type RoomId = usize;
 

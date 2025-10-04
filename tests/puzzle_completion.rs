@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use rust_game::components::puzzle::*;
 use rust_game::components::inventory::*;
+use rust_game::components::puzzle::*;
 use rust_game::components::room::*;
 use rust_game::resources::game_state::*;
 

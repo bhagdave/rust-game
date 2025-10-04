@@ -1,7 +1,7 @@
-use bevy::prelude::*;
-use bevy_kira_audio::AudioSource;
 use crate::components::inventory::KeyType;
 use crate::components::trap::Trap;
+use bevy::prelude::*;
+use bevy_kira_audio::AudioSource;
 use std::collections::HashMap;
 
 #[derive(Resource, Default)]
@@ -92,8 +92,12 @@ mod tests {
         // Store handles
         {
             let mut handles = app.world_mut().resource_mut::<AssetHandles>();
-            handles.sprites.insert(SpriteType::Player, player_handle.clone());
-            handles.sprites.insert(SpriteType::Candle, candle_handle.clone());
+            handles
+                .sprites
+                .insert(SpriteType::Player, player_handle.clone());
+            handles
+                .sprites
+                .insert(SpriteType::Candle, candle_handle.clone());
         }
 
         // Verify retrieval
@@ -114,8 +118,12 @@ mod tests {
 
         {
             let mut handles = app.world_mut().resource_mut::<AssetHandles>();
-            handles.audio.insert(SoundType::MatchStrike, match_sound.clone());
-            handles.audio.insert(SoundType::PlayerDeath, death_sound.clone());
+            handles
+                .audio
+                .insert(SoundType::MatchStrike, match_sound.clone());
+            handles
+                .audio
+                .insert(SoundType::PlayerDeath, death_sound.clone());
         }
 
         let handles = app.world().resource::<AssetHandles>();
@@ -218,7 +226,9 @@ mod tests {
 
         {
             let mut handles = app.world_mut().resource_mut::<AssetHandles>();
-            handles.sprites.insert(SpriteType::Player, player_handle.clone());
+            handles
+                .sprites
+                .insert(SpriteType::Player, player_handle.clone());
         }
 
         let handles = app.world().resource::<AssetHandles>();
