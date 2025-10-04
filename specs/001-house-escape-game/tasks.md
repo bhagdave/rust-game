@@ -719,7 +719,7 @@ fn auto_save_on_room_transition() {
 
 ---
 
-### T019: [P] Integration test: Room transitions
+### T019: [X] Integration test: Room transitions
 **File**: `tests/integration/room_transitions.rs`
 **Description**: Test room loading/unloading, player position update.
 
@@ -737,7 +737,7 @@ fn room_transition_loads_new_room() {
 
 ---
 
-### T020: [P] Integration test: Puzzle completion
+### T020: [X] Integration test: Puzzle completion
 **File**: `tests/integration/puzzle_completion.rs`
 **Description**: Test pressure plate puzzle from quickstart.md.
 
