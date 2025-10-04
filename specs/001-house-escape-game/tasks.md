@@ -324,7 +324,7 @@ pub struct Collider {
 
 ---
 
-### T010: [P] Implement Door components
+### T010: [X] Implement Door components
 **File**: `src/components/room.rs` (extend)
 **Description**: Add Door, DoorState, TargetRoom, Interactable to room module.
 
