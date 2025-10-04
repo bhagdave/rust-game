@@ -282,12 +282,12 @@ Embed assets in binary for native builds, load via HTTP for WASM builds.
 | Unknown | Resolution |
 |---------|------------|
 | Game engine | Bevy 0.16.1 |
-| 2D tilemap rendering | bevy_ecs_tilemap 0.15 |
-| Audio playback | bevy_kira_audio 0.21 |
-| UI framework | bevy_egui 0.31 |
+| 2D tilemap rendering | bevy_ecs_tilemap 0.16 ✅ VERIFIED |
+| Audio playback | bevy_kira_audio 0.23 ✅ VERIFIED |
+| UI framework | bevy_egui 0.36 ✅ VERIFIED |
 | Dynamic lighting | Custom WGSL shader + sprite masking |
 | Save/load format | RON + serde |
-| Input abstraction | leafwing-input-manager |
+| Input abstraction | leafwing-input-manager 0.17 ✅ VERIFIED |
 | Level data format | RON |
 | Collision system | Custom AABB (rapier2d optional) |
 | Testing strategy | cargo test + Bevy headless |
@@ -323,22 +323,22 @@ Embed assets in binary for native builds, load via HTTP for WASM builds.
 
 **Critical Dependencies Requiring Version Verification**:
 
-| Crate | Estimated Version | Status | Research Needed |
+| Crate | Verified Version | Status | Research Needed |
 |-------|------------------|--------|-----------------|
 | `bevy` | 0.16.1 | ✅ Confirmed (Cargo.toml) | Verify API patterns |
-| `bevy_ecs_tilemap` | ~0.15.0 | ⚠️ Needs verification | Check Bevy 0.16.1 compat |
-| `bevy_kira_audio` | ~0.21.0 | ⚠️ Needs verification | Check Bevy 0.16.1 compat |
-| `bevy_egui` | ~0.31.0 | ⚠️ Needs verification | Check Bevy 0.16.1 compat |
-| `leafwing-input-manager` | ❓ Unknown | ⚠️ Needs research | Find compatible version |
+| `bevy_ecs_tilemap` | 0.16.0 | ✅ VERIFIED | Compatible with Bevy 0.16 |
+| `bevy_kira_audio` | 0.23.0 | ✅ VERIFIED | Compatible with Bevy 0.16 |
+| `bevy_egui` | 0.36.0 | ✅ VERIFIED | Compatible with Bevy 0.16 (0.34-0.36) |
+| `leafwing-input-manager` | 0.17.0 | ✅ VERIFIED | Compatible with Bevy 0.16 |
 | `serde` | ~1.0 | ✅ Stable | No breaking changes |
 | `ron` | ~0.8 | ✅ Stable | No breaking changes |
 
 **Research Tasks**:
-- [ ] Check bevy_ecs_tilemap GitHub for Bevy 0.16.1 compatibility
-- [ ] Check bevy_kira_audio crates.io/GitHub for latest compatible version
-- [ ] Check bevy_egui releases for Bevy 0.16.1 support
-- [ ] Search for leafwing-input-manager Bevy 0.16 compatibility
-- [ ] Verify all plugin versions can coexist without conflicts
+- [x] Check bevy_ecs_tilemap GitHub for Bevy 0.16.1 compatibility - VERIFIED: 0.16.0
+- [x] Check bevy_kira_audio GitHub for Bevy 0.16.1 compatibility - VERIFIED: 0.23.0
+- [x] Check bevy_egui GitHub for Bevy 0.16.1 compatibility - VERIFIED: 0.36.0
+- [x] Check leafwing-input-manager GitHub for Bevy 0.16.1 compatibility - VERIFIED: 0.17.0
+- [x] Verify all plugin versions can coexist without conflicts - ALL VERIFIED ✅
 
 **Risk**: Medium - Plugins may lag behind Bevy releases, requiring version pinning or alternative solutions.
 
