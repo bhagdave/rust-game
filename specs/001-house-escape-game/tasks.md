@@ -152,7 +152,7 @@ pub mod audio;
 
 **CRITICAL**: These components define game state. Implement all in parallel [P] as they are independent files.
 
-### T006: [P] Implement Player components
+### T006: [X] Implement Player components
 **File**: `src/components/player.rs`
 **Description**: Define Player marker component, Velocity, JumpState, Health.
 
