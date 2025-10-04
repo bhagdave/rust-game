@@ -134,7 +134,7 @@ pub mod audio;
 
 ---
 
-### T005: [P] Configure CI/CD with GitHub Actions
+### T005: [X] Configure CI/CD with GitHub Actions
 **File**: `.github/workflows/ci.yml`
 **Description**: Create CI pipeline for tests, linting, and cross-platform builds.
 
