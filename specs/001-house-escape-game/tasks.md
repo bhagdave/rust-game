@@ -350,7 +350,7 @@ pub struct Interactable; // marker for player interaction
 
 ---
 
-### T011: [P] Implement Trap components
+### T011: [X] Implement Trap components
 **File**: `src/components/trap.rs`
 **Description**: Define Trap, TrapTrigger, TrapState, InstantDeath, EnvironmentalHazard.
 
