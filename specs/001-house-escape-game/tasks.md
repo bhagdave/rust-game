@@ -781,7 +781,7 @@ fn candle_extinguishes_at_zero_wax() {
 
 ---
 
-### T022: [P] Unit test: Inventory management
+### T022: [X] ✅ Unit test: Inventory management
 **File**: `tests/unit/inventory_test.rs`
 **Description**: Test item pickup, stack handling, capacity limits.
 
