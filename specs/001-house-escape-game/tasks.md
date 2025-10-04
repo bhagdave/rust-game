@@ -468,7 +468,7 @@ pub struct LeverCombinationPuzzle {
 
 ## Phase 3.3: Resource Definitions (Global State)
 
-### T013: [P] Implement GameState resource
+### T013: [X] Implement GameState resource
 **File**: `src/resources/game_state.rs`
 **Description**: Define GameState resource for current room, spawn point, stats.
 
