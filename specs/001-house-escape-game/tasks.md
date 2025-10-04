@@ -271,7 +271,7 @@ pub struct Collectible; // marker for pickup
 
 ---
 
-### T009: [P] Implement Room components
+### T009: [X] Implement Room components
 **File**: `src/components/room.rs`
 **Description**: Define Room, RoomBounds, RoomConnection, Door, Collider.
 
