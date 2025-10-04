@@ -19,9 +19,10 @@
 
 ## Phase 3.1: Project Setup & Dependencies
 
-### T001: ✅ Update Cargo.toml with verified dependency versions
+### T001: [X] ✅ Update Cargo.toml with verified dependency versions - COMPLETED
 **File**: `Cargo.toml`
 **Description**: Add all required dependencies with exact versions compatible with Bevy 0.16.1. All versions have been verified from official GitHub repositories.
+**Status**: ✅ COMPLETED - All dependencies added and verified with `cargo check`
 
 **Dependencies to add**:
 ```toml
