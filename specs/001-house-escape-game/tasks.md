@@ -515,7 +515,7 @@ impl Default for GameState {
 
 ---
 
-### T014: [P] ✅ Implement InputConfig resource with leafwing-input-manager
+### T014: [X] ✅ Implement InputConfig resource with leafwing-input-manager
 **File**: `src/resources/input_config.rs`
 **Description**: Define InputConfig using leafwing-input-manager 0.17.0 for configurable controls.
 
