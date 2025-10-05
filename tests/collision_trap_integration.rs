@@ -3,7 +3,7 @@ use rust_game::components::player::{Health, Player};
 use rust_game::components::room::Collider;
 use rust_game::components::trap::{Trap, TrapState, TrapTrigger};
 use rust_game::systems::collision::collision_detection_system;
-use rust_game::systems::trap::{trap_activation_system, PlayerDeathEvent, TrapTriggeredEvent};
+use rust_game::systems::trap::{PlayerDeathEvent, TrapTriggeredEvent, trap_activation_system};
 
 #[test]
 fn collision_detection_triggers_trap_activation() {
@@ -15,7 +15,10 @@ fn collision_detection_triggers_trap_activation() {
     app.add_event::<PlayerDeathEvent>();
 
     // Add both systems - collision detection followed by trap activation
-    app.add_systems(Update, (collision_detection_system, trap_activation_system).chain());
+    app.add_systems(
+        Update,
+        (collision_detection_system, trap_activation_system).chain(),
+    );
 
     // Spawn player at origin
     let player = app
@@ -96,7 +99,10 @@ fn no_collision_no_trap_activation() {
     app.add_event::<PlayerDeathEvent>();
 
     // Add both systems
-    app.add_systems(Update, (collision_detection_system, trap_activation_system).chain());
+    app.add_systems(
+        Update,
+        (collision_detection_system, trap_activation_system).chain(),
+    );
 
     // Spawn player at origin
     let player = app
@@ -166,7 +172,10 @@ fn multiple_trap_collisions_all_trigger() {
     app.add_event::<PlayerDeathEvent>();
 
     // Add both systems
-    app.add_systems(Update, (collision_detection_system, trap_activation_system).chain());
+    app.add_systems(
+        Update,
+        (collision_detection_system, trap_activation_system).chain(),
+    );
 
     // Spawn player at origin
     let player = app

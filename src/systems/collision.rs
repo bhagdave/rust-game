@@ -2,6 +2,7 @@ use crate::components::inventory::Collectible;
 use crate::components::player::Player;
 use crate::components::room::Collider;
 use crate::components::trap::Trap;
+use crate::systems::inventory::ItemCollectedEvent;
 use crate::systems::trap::TrapTriggeredEvent;
 use bevy::prelude::*;
 
@@ -9,15 +10,16 @@ use bevy::prelude::*;
 ///
 /// Handles:
 /// - Player vs trap collisions → emits `TrapTriggeredEvent`
-/// - Player vs collectible item collisions → will emit `ItemCollectedEvent` (T029)
+/// - Player vs collectible item collisions → emits `ItemCollectedEvent`
 /// - Player vs door collisions (future work)
 ///
 /// # Events Emitted
 /// - `TrapTriggeredEvent` when player collides with a trap
-/// - `ItemCollectedEvent` when player collides with collectible (TODO: T029)
+/// - `ItemCollectedEvent` when player collides with collectible
 ///
 /// # System Dependencies
 /// - **Downstream**: `trap_activation_system` consumes `TrapTriggeredEvent`
+/// - **Downstream**: `inventory_collection_system` consumes `ItemCollectedEvent`
 /// - **Related**: Works with `Collider` component for spatial queries
 ///
 /// # Performance
@@ -31,6 +33,7 @@ pub fn collision_detection_system(
     trap_query: Query<(Entity, &Transform, &Collider), With<Trap>>,
     item_query: Query<(Entity, &Transform, &Collider), With<Collectible>>,
     mut trap_events: EventWriter<TrapTriggeredEvent>,
+    mut item_events: EventWriter<ItemCollectedEvent>,
 ) {
     for (player_entity, player_transform, player_collider) in &player_query {
         let player_pos = player_transform.translation.truncate();
@@ -51,12 +54,11 @@ pub fn collision_detection_system(
         for (item_entity, item_transform, item_collider) in &item_query {
             let item_pos = item_transform.translation.truncate();
             if aabb_intersects(player_pos, player_collider, item_pos, item_collider) {
-                // TODO: Emit ItemCollectedEvent (will be implemented in T029)
-                // For now, log the collision for debugging
-                debug!(
-                    "Collision detected: Player {:?} collected item {:?}",
-                    player_entity, item_entity
-                );
+                // Emit ItemCollectedEvent for inventory_collection_system to handle
+                item_events.write(ItemCollectedEvent {
+                    item: item_entity,
+                    player: player_entity,
+                });
             }
         }
     }
@@ -212,8 +214,9 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
 
-        // Add TrapTriggeredEvent
+        // Add events
         app.add_event::<TrapTriggeredEvent>();
+        app.add_event::<ItemCollectedEvent>();
 
         // Add collision detection system
         app.add_systems(Update, collision_detection_system);
@@ -269,8 +272,9 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
 
-        // Add TrapTriggeredEvent
+        // Add events
         app.add_event::<TrapTriggeredEvent>();
+        app.add_event::<ItemCollectedEvent>();
 
         app.add_systems(Update, collision_detection_system);
 
@@ -312,8 +316,9 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
 
-        // Add TrapTriggeredEvent
+        // Add events
         app.add_event::<TrapTriggeredEvent>();
+        app.add_event::<ItemCollectedEvent>();
 
         app.add_systems(Update, collision_detection_system);
 
@@ -363,8 +368,9 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
 
-        // Add TrapTriggeredEvent
+        // Add events
         app.add_event::<TrapTriggeredEvent>();
+        app.add_event::<ItemCollectedEvent>();
 
         app.add_systems(Update, collision_detection_system);
 
@@ -459,8 +465,9 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
 
-        // Add TrapTriggeredEvent
+        // Add events
         app.add_event::<TrapTriggeredEvent>();
+        app.add_event::<ItemCollectedEvent>();
 
         app.add_systems(Update, collision_detection_system);
 
