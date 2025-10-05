@@ -522,7 +522,7 @@ fn multiple_save_slots_supported() {
     app.insert_resource(MapState::default());
 
     // Spawn player and candle
-    let player = app
+    let _player = app
         .world_mut()
         .spawn((
             Player,

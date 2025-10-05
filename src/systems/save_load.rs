@@ -648,7 +648,7 @@ mod tests {
 
         for item in items {
             let serialized = serialize_item(&item);
-            let deserialized = deserialize_item(&serialized);
+            let _deserialized = deserialize_item(&serialized);
             // Note: This test can't use PartialEq on Item due to Color in PuzzleItem
             // but it ensures the round-trip works
         }
