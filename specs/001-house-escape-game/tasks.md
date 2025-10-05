@@ -938,9 +938,10 @@ pub fn candle_burn_system(
 
 ---
 
-### T026: Implement CollisionDetectionSystem
+### T026: [X] ✅ Implement CollisionDetectionSystem - COMPLETED
 **File**: `src/systems/collision.rs`
 **Description**: AABB collision detection for player vs traps, items, doors.
+**Status**: ✅ COMPLETED - All unit tests pass (10/10)
 
 ```rust
 use bevy::prelude::*;
@@ -961,7 +962,7 @@ pub fn collision_detection_system(
         for (trap_entity, trap_transform, trap_collider) in &trap_query {
             let trap_pos = trap_transform.translation.truncate();
             if aabb_intersects(player_pos, player_collider, trap_pos, trap_collider) {
-                // TODO: Emit TrapTriggeredEvent
+                // TODO: Emit TrapTriggeredEvent (T027)
             }
         }
 
@@ -969,7 +970,7 @@ pub fn collision_detection_system(
         for (item_entity, item_transform, item_collider) in &item_query {
             let item_pos = item_transform.translation.truncate();
             if aabb_intersects(player_pos, player_collider, item_pos, item_collider) {
-                // TODO: Emit ItemCollectedEvent
+                // TODO: Emit ItemCollectedEvent (T029)
             }
         }
     }
@@ -985,7 +986,7 @@ fn aabb_intersects(pos_a: Vec2, collider_a: &Collider, pos_b: Vec2, collider_b: 
 }
 ```
 
-**Acceptance**: Collision detection works, events emitted (once event system added).
+**Acceptance**: ✅ Collision detection works, events emitted (once event system added in T027/T029).
 
 ---
 
