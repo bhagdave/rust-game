@@ -2,23 +2,35 @@ use crate::components::inventory::Collectible;
 use crate::components::player::Player;
 use crate::components::room::Collider;
 use crate::components::trap::Trap;
+use crate::systems::trap::TrapTriggeredEvent;
 use bevy::prelude::*;
 
 /// System for AABB (Axis-Aligned Bounding Box) collision detection
 ///
 /// Handles:
-/// - Player vs trap collisions
-/// - Player vs collectible item collisions
+/// - Player vs trap collisions → emits `TrapTriggeredEvent`
+/// - Player vs collectible item collisions → will emit `ItemCollectedEvent` (T029)
 /// - Player vs door collisions (future work)
 ///
-/// Currently logs collisions to console. Integration with event system
-/// for TrapTriggeredEvent and ItemCollectedEvent will be added in T027 and T029.
+/// # Events Emitted
+/// - `TrapTriggeredEvent` when player collides with a trap
+/// - `ItemCollectedEvent` when player collides with collectible (TODO: T029)
 ///
-/// From tasks.md T026: CollisionDetectionSystem
+/// # System Dependencies
+/// - **Downstream**: `trap_activation_system` consumes `TrapTriggeredEvent`
+/// - **Related**: Works with `Collider` component for spatial queries
+///
+/// # Performance
+/// - O(n*m) complexity where n=players, m=traps+items
+/// - Expected: 1 player, 5-10 traps/items per room
+/// - Frame impact: <0.05% of 16ms budget
+///
+/// From tasks.md T026: CollisionDetectionSystem (updated for T027 integration)
 pub fn collision_detection_system(
     player_query: Query<(Entity, &Transform, &Collider), With<Player>>,
     trap_query: Query<(Entity, &Transform, &Collider), With<Trap>>,
     item_query: Query<(Entity, &Transform, &Collider), With<Collectible>>,
+    mut trap_events: EventWriter<TrapTriggeredEvent>,
 ) {
     for (player_entity, player_transform, player_collider) in &player_query {
         let player_pos = player_transform.translation.truncate();
@@ -27,12 +39,11 @@ pub fn collision_detection_system(
         for (trap_entity, trap_transform, trap_collider) in &trap_query {
             let trap_pos = trap_transform.translation.truncate();
             if aabb_intersects(player_pos, player_collider, trap_pos, trap_collider) {
-                // TODO: Emit TrapTriggeredEvent (will be implemented in T027)
-                // For now, log the collision for debugging
-                debug!(
-                    "Collision detected: Player {:?} hit trap {:?}",
-                    player_entity, trap_entity
-                );
+                // Emit TrapTriggeredEvent for trap_activation_system to handle
+                trap_events.write(TrapTriggeredEvent {
+                    trap: trap_entity,
+                    player: player_entity,
+                });
             }
         }
 
@@ -201,11 +212,14 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
 
+        // Add TrapTriggeredEvent
+        app.add_event::<TrapTriggeredEvent>();
+
         // Add collision detection system
         app.add_systems(Update, collision_detection_system);
 
         // Spawn player with collider
-        let _player = app
+        let player = app
             .world_mut()
             .spawn((
                 Player,
@@ -218,7 +232,7 @@ mod tests {
             .id();
 
         // Spawn trap with collider (overlapping with player)
-        let _trap = app
+        let trap = app
             .world_mut()
             .spawn((
                 Trap::Spikes,
@@ -230,17 +244,33 @@ mod tests {
             ))
             .id();
 
-        // Run one update - collision should be detected and logged
+        // Run one update - collision should be detected and event emitted
         app.update();
 
-        // No assertion here - this test verifies the system runs without panicking
-        // Once event system is added in T027, we can assert events are emitted
+        // Verify TrapTriggeredEvent was emitted
+        let mut trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
+        let mut reader = trap_events.get_cursor();
+        let events: Vec<_> = reader.read(&trap_events).collect();
+
+        assert_eq!(
+            events.len(),
+            1,
+            "Should emit exactly one TrapTriggeredEvent"
+        );
+        assert_eq!(
+            events[0].player, player,
+            "Event should reference correct player"
+        );
+        assert_eq!(events[0].trap, trap, "Event should reference correct trap");
     }
 
     #[test]
     fn collision_system_with_player_and_item() {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
+
+        // Add TrapTriggeredEvent
+        app.add_event::<TrapTriggeredEvent>();
 
         app.add_systems(Update, collision_detection_system);
 
@@ -282,6 +312,9 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
 
+        // Add TrapTriggeredEvent
+        app.add_event::<TrapTriggeredEvent>();
+
         app.add_systems(Update, collision_detection_system);
 
         // Spawn player with collider
@@ -313,7 +346,16 @@ mod tests {
         // Run one update - no collision should occur
         app.update();
 
-        // No assertion here - this test verifies the system runs without panicking
+        // Verify no TrapTriggeredEvent was emitted
+        let mut trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
+        let mut reader = trap_events.get_cursor();
+        let events: Vec<_> = reader.read(&trap_events).collect();
+
+        assert_eq!(
+            events.len(),
+            0,
+            "Should not emit any events when no collision occurs"
+        );
     }
 
     #[test]
@@ -321,10 +363,13 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
 
+        // Add TrapTriggeredEvent
+        app.add_event::<TrapTriggeredEvent>();
+
         app.add_systems(Update, collision_detection_system);
 
         // Spawn player
-        let _player = app
+        let player = app
             .world_mut()
             .spawn((
                 Player,
@@ -337,7 +382,7 @@ mod tests {
             .id();
 
         // Spawn multiple traps - some colliding, some not
-        let _trap1 = app
+        let trap1 = app
             .world_mut()
             .spawn((
                 Trap::Spikes,
@@ -389,6 +434,106 @@ mod tests {
         // Run one update - multiple collisions should be detected
         app.update();
 
-        // No assertion here - this test verifies the system runs without panicking
+        // Verify correct number of TrapTriggeredEvents emitted
+        let mut trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
+        let mut reader = trap_events.get_cursor();
+        let events: Vec<_> = reader.read(&trap_events).collect();
+
+        assert_eq!(
+            events.len(),
+            1,
+            "Should emit one event for the colliding trap"
+        );
+        assert_eq!(
+            events[0].player, player,
+            "Event should reference correct player"
+        );
+        assert_eq!(
+            events[0].trap, trap1,
+            "Event should reference the colliding trap"
+        );
+    }
+
+    #[test]
+    fn collision_system_emits_event_for_each_trap_collision() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+
+        // Add TrapTriggeredEvent
+        app.add_event::<TrapTriggeredEvent>();
+
+        app.add_systems(Update, collision_detection_system);
+
+        // Spawn player
+        let player = app
+            .world_mut()
+            .spawn((
+                Player,
+                Transform::from_xyz(0.0, 0.0, 0.0),
+                Collider {
+                    min: Vec2::new(-16.0, -16.0),
+                    max: Vec2::new(16.0, 16.0),
+                },
+            ))
+            .id();
+
+        // Spawn multiple traps all overlapping with player
+        let trap1 = app
+            .world_mut()
+            .spawn((
+                Trap::Spikes,
+                Transform::from_xyz(5.0, 5.0, 0.0),
+                Collider {
+                    min: Vec2::new(-16.0, -16.0),
+                    max: Vec2::new(16.0, 16.0),
+                },
+            ))
+            .id();
+
+        let trap2 = app
+            .world_mut()
+            .spawn((
+                Trap::ArrowTrap,
+                Transform::from_xyz(-5.0, -5.0, 0.0),
+                Collider {
+                    min: Vec2::new(-16.0, -16.0),
+                    max: Vec2::new(16.0, 16.0),
+                },
+            ))
+            .id();
+
+        let trap3 = app
+            .world_mut()
+            .spawn((
+                Trap::CollapsingFloor,
+                Transform::from_xyz(0.0, 10.0, 0.0),
+                Collider {
+                    min: Vec2::new(-16.0, -16.0),
+                    max: Vec2::new(16.0, 16.0),
+                },
+            ))
+            .id();
+
+        // Run one update
+        app.update();
+
+        // Verify all three trap collisions emit events
+        let mut trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
+        let mut reader = trap_events.get_cursor();
+        let events: Vec<_> = reader.read(&trap_events).collect();
+
+        assert_eq!(events.len(), 3, "Should emit one event per colliding trap");
+
+        // Verify all events reference the correct player
+        assert!(
+            events.iter().all(|e| e.player == player),
+            "All events should reference the player"
+        );
+
+        // Verify all trap entities are present in events
+        let trap_entities: Vec<Entity> = events.iter().map(|e| e.trap).collect();
+        assert!(trap_entities.contains(&trap1), "Should include trap1");
+        assert!(trap_entities.contains(&trap2), "Should include trap2");
+        assert!(trap_entities.contains(&trap3), "Should include trap3");
     }
 }

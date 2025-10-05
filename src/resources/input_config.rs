@@ -121,7 +121,7 @@ mod tests {
 
     #[test]
     fn can_create_input_manager_bundle() {
-        let input_map = default_input_map();
+        let _input_map = default_input_map();
 
         // Create bundle that would be used with player entity
         // Insert InputMap and ActionState separately per new API
