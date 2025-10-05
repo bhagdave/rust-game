@@ -938,10 +938,26 @@ pub fn candle_burn_system(
 
 ---
 
-### T026: [X] ✅ Implement CollisionDetectionSystem - COMPLETED
+### T026: [X] ✅ Implement CollisionDetectionSystem - COMPLETED & ENHANCED
 **File**: `src/systems/collision.rs`
 **Description**: AABB collision detection for player vs traps, items, doors.
-**Status**: ✅ COMPLETED - All unit tests pass (10/10)
+**Status**: ✅ COMPLETED - Enhanced with TrapTriggeredEvent emission (T027 integration)
+
+**Implementation Details**:
+- ✅ AABB collision detection algorithm (aabb_intersects)
+- ✅ Player vs trap collision detection with event emission
+- ✅ Player vs item collision detection (ItemCollectedEvent pending T029)
+- ✅ 11 comprehensive unit tests (100% pass rate)
+- ✅ 3 integration tests validating collision → trap activation flow
+- ✅ Full rustdoc documentation
+- ✅ Event-driven architecture for system decoupling
+
+**Test Results**: 
+- Unit tests: 11/11 passing
+- Integration tests: 3/3 passing (collision_trap_integration.rs)
+- Total: 103 library tests passing
+
+**Update (2025-01-05)**: Enhanced to emit `TrapTriggeredEvent` on trap collisions, completing integration with T027 TrapActivationSystem. See T026_UPDATE_REPORT.md for details.
 
 ```rust
 use bevy::prelude::*;
@@ -949,11 +965,13 @@ use crate::components::player::Player;
 use crate::components::room::Collider;
 use crate::components::trap::Trap;
 use crate::components::inventory::Collectible;
+use crate::systems::trap::TrapTriggeredEvent;
 
 pub fn collision_detection_system(
     player_query: Query<(Entity, &Transform, &Collider), With<Player>>,
     trap_query: Query<(Entity, &Transform, &Collider), With<Trap>>,
     item_query: Query<(Entity, &Transform, &Collider), With<Collectible>>,
+    mut trap_events: EventWriter<TrapTriggeredEvent>,  // ✅ Added for T027 integration
 ) {
     for (player_entity, player_transform, player_collider) in &player_query {
         let player_pos = player_transform.translation.truncate();
@@ -962,7 +980,11 @@ pub fn collision_detection_system(
         for (trap_entity, trap_transform, trap_collider) in &trap_query {
             let trap_pos = trap_transform.translation.truncate();
             if aabb_intersects(player_pos, player_collider, trap_pos, trap_collider) {
-                // TODO: Emit TrapTriggeredEvent (T027)
+                // ✅ Emit TrapTriggeredEvent for trap_activation_system
+                trap_events.send(TrapTriggeredEvent {
+                    trap: trap_entity,
+                    player: player_entity,
+                });
             }
         }
 
@@ -975,18 +997,13 @@ pub fn collision_detection_system(
         }
     }
 }
-
-fn aabb_intersects(pos_a: Vec2, collider_a: &Collider, pos_b: Vec2, collider_b: &Collider) -> bool {
-    let a_min = pos_a + collider_a.min;
-    let a_max = pos_a + collider_a.max;
-    let b_min = pos_b + collider_b.min;
-    let b_max = pos_b + collider_b.max;
-
-    a_min.x < b_max.x && a_max.x > b_min.x && a_min.y < b_max.y && a_max.y > b_min.y
-}
 ```
 
-**Acceptance**: ✅ Collision detection works, events emitted (once event system added in T027/T029).
+**Acceptance**: ✅ Collision detection works, TrapTriggeredEvent emitted for trap collisions, ItemCollectedEvent pending T029.
+
+**Validation Reports**: 
+- T026_VALIDATION_REPORT.md (original completion)
+- T026_UPDATE_REPORT.md (T027 integration update)
 
 ---
 
