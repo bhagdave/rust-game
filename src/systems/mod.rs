@@ -6,4 +6,5 @@ pub mod puzzle;
 pub mod respawn;
 pub mod room_transition;
 pub mod save_load;
+pub mod tilemap;
 pub mod trap;
