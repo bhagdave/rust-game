@@ -28,7 +28,7 @@ pub fn inventory_collection_system(
 
             if let Ok((item, stackable)) = item_query.get(event.item) {
                 // Handle stackable vs unique items
-                if let Some(_) = stackable {
+                if stackable.is_some() {
                     // TODO: Implement stacking; for now, push another instance
                     inventory.items.push(item.clone());
                 } else {
