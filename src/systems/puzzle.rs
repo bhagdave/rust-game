@@ -286,8 +286,7 @@ mod tests {
         app.add_event::<PuzzleSolvedEvent>();
         app.add_systems(Update, puzzle_interaction_system);
 
-        // System compiles and can be added to app
-        assert!(true);
+        // System compiles and can be added to app - verified by compilation
     }
 
     #[test]
@@ -297,7 +296,7 @@ mod tests {
         app.add_event::<PuzzleSolvedEvent>();
         app.add_systems(Update, puzzle_reward_system);
 
-        assert!(true);
+        // System compiles and can be added to app - verified by compilation
     }
 
     #[test]
