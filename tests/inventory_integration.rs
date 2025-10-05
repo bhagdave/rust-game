@@ -6,14 +6,13 @@
 /// 3. Item entity is despawned from world
 /// 4. Inventory capacity is enforced
 /// 5. Item usage removes items from inventory
-
 use bevy::prelude::*;
 use rust_game::components::inventory::*;
 use rust_game::components::player::Player;
 use rust_game::components::room::Collider;
 use rust_game::systems::collision::collision_detection_system;
 use rust_game::systems::inventory::{
-    inventory_collection_system, inventory_usage_system, ItemCollectedEvent, ItemUsedEvent,
+    ItemCollectedEvent, ItemUsedEvent, inventory_collection_system, inventory_usage_system,
 };
 use rust_game::systems::trap::TrapTriggeredEvent;
 
@@ -66,11 +65,7 @@ fn full_item_pickup_flow() {
     // Verify initial state
     {
         let inventory = app.world().get::<Inventory>(player).unwrap();
-        assert_eq!(
-            inventory.items.len(),
-            0,
-            "Inventory should start empty"
-        );
+        assert_eq!(inventory.items.len(), 0, "Inventory should start empty");
     }
 
     {
@@ -269,11 +264,7 @@ fn multiple_items_collected_in_order() {
     // Verify all 3 items collected
     {
         let inventory = app.world().get::<Inventory>(player).unwrap();
-        assert_eq!(
-            inventory.items.len(),
-            3,
-            "All 3 items should be collected"
-        );
+        assert_eq!(inventory.items.len(), 3, "All 3 items should be collected");
 
         // Verify all item types are present
         let has_match = inventory.items.iter().any(|i| matches!(i, Item::Match));

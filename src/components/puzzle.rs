@@ -143,10 +143,12 @@ mod tests {
 
     #[test]
     fn symbol_enum_values() {
-        let symbols = [Symbol::Circle,
+        let symbols = [
+            Symbol::Circle,
             Symbol::Triangle,
             Symbol::Square,
-            Symbol::Star];
+            Symbol::Star,
+        ];
 
         assert_eq!(symbols.len(), 4);
         assert_eq!(symbols[0], Symbol::Circle);

@@ -102,18 +102,19 @@ pub fn inventory_usage_system(
     for event in events.read() {
         if let Ok(mut inventory) = inventory_query.get_mut(event.player) {
             // Find and remove the first matching item
-            if let Some(pos) = inventory
-                .items
-                .iter()
-                .position(|inv_item| match (&event.item, inv_item) {
-                    (Item::Match, Item::Match) => true,
-                    (Item::Key(k1), Item::Key(k2)) => k1 == k2,
-                    (Item::Tool(t1), Item::Tool(t2)) => t1 == t2,
-                    (Item::PuzzleItem(p1), Item::PuzzleItem(p2)) => p1 == p2,
-                    (Item::DoubleJumpItem, Item::DoubleJumpItem) => true,
-                    (Item::DiaryPage(n1), Item::DiaryPage(n2)) => n1 == n2,
-                    _ => false,
-                })
+            if let Some(pos) =
+                inventory
+                    .items
+                    .iter()
+                    .position(|inv_item| match (&event.item, inv_item) {
+                        (Item::Match, Item::Match) => true,
+                        (Item::Key(k1), Item::Key(k2)) => k1 == k2,
+                        (Item::Tool(t1), Item::Tool(t2)) => t1 == t2,
+                        (Item::PuzzleItem(p1), Item::PuzzleItem(p2)) => p1 == p2,
+                        (Item::DoubleJumpItem, Item::DoubleJumpItem) => true,
+                        (Item::DiaryPage(n1), Item::DiaryPage(n2)) => n1 == n2,
+                        _ => false,
+                    })
             {
                 inventory.items.remove(pos);
             }
