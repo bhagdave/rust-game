@@ -990,9 +990,10 @@ fn aabb_intersects(pos_a: Vec2, collider_a: &Collider, pos_b: Vec2, collider_b: 
 
 ---
 
-### T027: Implement TrapActivationSystem
+### T027: [X] Implement TrapActivationSystem
 **File**: `src/systems/trap.rs` (create new file under systems/)
 **Description**: System handling trap triggers and player death.
+**Status**: ✅ COMPLETED - System implemented with events for trap triggering and player death
 
 ```rust
 use bevy::prelude::*;
