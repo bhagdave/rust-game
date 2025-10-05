@@ -56,13 +56,20 @@ fn candle_burns_when_lit() {
     // Assert: Wax should have decreased (exact amount depends on time deltas)
     {
         let wax = app.world().get::<CandleWax>(candle_entity).unwrap();
-        assert!(wax.0 < 100.0, "Wax should decrease over time (wax: {})", wax.0);
+        assert!(
+            wax.0 < 100.0,
+            "Wax should decrease over time (wax: {})",
+            wax.0
+        );
     }
 
     // Assert: Visibility radius remains large while lit (candle hasn't extinguished)
     {
         let radius = app.world().get::<VisibilityRadius>(candle_entity).unwrap();
-        assert_eq!(radius.0, 7.0, "Visibility radius should remain large while lit");
+        assert_eq!(
+            radius.0, 7.0,
+            "Visibility radius should remain large while lit"
+        );
     }
 }
 
@@ -127,8 +134,11 @@ fn candle_extinguishes_at_zero_wax() {
     // Assert: Candle state changes to Extinguished when wax hits 0
     {
         let state = app.world().get::<CandleState>(candle_entity).unwrap();
-        assert_eq!(*state, CandleState::Extinguished,
-                   "Candle should extinguish at 0 wax");
+        assert_eq!(
+            *state,
+            CandleState::Extinguished,
+            "Candle should extinguish at 0 wax"
+        );
     }
 
     // Assert: Wax is 0.0
@@ -140,7 +150,10 @@ fn candle_extinguishes_at_zero_wax() {
     // Assert: Visibility radius shrinks to 1.5
     {
         let radius = app.world().get::<VisibilityRadius>(candle_entity).unwrap();
-        assert_eq!(radius.0, 1.5, "Visibility radius should shrink when extinguished");
+        assert_eq!(
+            radius.0, 1.5,
+            "Visibility radius should shrink when extinguished"
+        );
     }
 }
 
@@ -260,12 +273,18 @@ fn visibility_radius_updates_based_on_candle_state() {
     // Assert: Lit candle has large visibility radius (7.0)
     {
         let radius = app.world().get::<VisibilityRadius>(candle_entity).unwrap();
-        assert_eq!(radius.0, 7.0, "Lit candle should have large visibility radius");
+        assert_eq!(
+            radius.0, 7.0,
+            "Lit candle should have large visibility radius"
+        );
     }
 
     // Act: Manually change candle to Unlit
     {
-        let mut state = app.world_mut().get_mut::<CandleState>(candle_entity).unwrap();
+        let mut state = app
+            .world_mut()
+            .get_mut::<CandleState>(candle_entity)
+            .unwrap();
         *state = CandleState::Unlit;
     }
 
@@ -275,7 +294,10 @@ fn visibility_radius_updates_based_on_candle_state() {
     // Assert: Unlit candle has small visibility radius (1.5)
     {
         let radius = app.world().get::<VisibilityRadius>(candle_entity).unwrap();
-        assert_eq!(radius.0, 1.5, "Unlit candle should have small visibility radius");
+        assert_eq!(
+            radius.0, 1.5,
+            "Unlit candle should have small visibility radius"
+        );
     }
 }
 
@@ -328,11 +350,20 @@ fn burn_rate_affects_depletion_speed() {
         let fast_wax = app.world().get::<CandleWax>(fast_candle).unwrap();
         let slow_wax = app.world().get::<CandleWax>(slow_candle).unwrap();
 
-        assert!(fast_wax.0 < slow_wax.0,
-                "Fast burning candle should deplete more (fast: {}, slow: {})",
-                fast_wax.0, slow_wax.0);
-        assert!(fast_wax.0 < 100.0, "Fast candle should have burned some wax");
-        assert!(slow_wax.0 < 100.0, "Slow candle should have burned some wax");
+        assert!(
+            fast_wax.0 < slow_wax.0,
+            "Fast burning candle should deplete more (fast: {}, slow: {})",
+            fast_wax.0,
+            slow_wax.0
+        );
+        assert!(
+            fast_wax.0 < 100.0,
+            "Fast candle should have burned some wax"
+        );
+        assert!(
+            slow_wax.0 < 100.0,
+            "Slow candle should have burned some wax"
+        );
     }
 }
 
@@ -412,7 +443,10 @@ fn multiple_candles_burn_independently() {
 
     // Manually deplete low wax candle to test extinguish behavior
     {
-        let mut wax = app.world_mut().get_mut::<CandleWax>(low_wax_candle).unwrap();
+        let mut wax = app
+            .world_mut()
+            .get_mut::<CandleWax>(low_wax_candle)
+            .unwrap();
         wax.0 = 0.0;
     }
 
@@ -422,6 +456,10 @@ fn multiple_candles_burn_independently() {
     // Assert: Low wax candle extinguishes at 0.0
     {
         let state = app.world().get::<CandleState>(low_wax_candle).unwrap();
-        assert_eq!(*state, CandleState::Extinguished, "Low wax candle should be extinguished");
+        assert_eq!(
+            *state,
+            CandleState::Extinguished,
+            "Low wax candle should be extinguished"
+        );
     }
 }

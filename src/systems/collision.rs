@@ -1,8 +1,8 @@
-use bevy::prelude::*;
+use crate::components::inventory::Collectible;
 use crate::components::player::Player;
 use crate::components::room::Collider;
 use crate::components::trap::Trap;
-use crate::components::inventory::Collectible;
+use bevy::prelude::*;
 
 /// System for AABB (Axis-Aligned Bounding Box) collision detection
 ///

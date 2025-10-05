@@ -1,6 +1,6 @@
-use bevy::prelude::*;
 use crate::components::lighting::*;
-use crate::resources::game_state::{GameState, GameMode};
+use crate::resources::game_state::{GameMode, GameState};
+use bevy::prelude::*;
 
 /// System for candle wax depletion and state transitions
 ///
@@ -15,7 +15,12 @@ pub fn candle_burn_system(
     time: Res<Time>,
     game_state: Res<GameState>,
     mut query: Query<
-        (&mut CandleWax, &mut CandleState, &mut VisibilityRadius, &BurnRate),
+        (
+            &mut CandleWax,
+            &mut CandleState,
+            &mut VisibilityRadius,
+            &BurnRate,
+        ),
         With<Candle>,
     >,
 ) {
@@ -167,10 +172,7 @@ mod tests {
             wax.0
         };
 
-        assert_eq!(
-            final_wax, initial_wax,
-            "Unlit candle should not burn"
-        );
+        assert_eq!(final_wax, initial_wax, "Unlit candle should not burn");
     }
 
     #[test]
@@ -262,7 +264,10 @@ mod tests {
 
         // Manually change to unlit
         {
-            let mut state = app.world_mut().get_mut::<CandleState>(candle_entity).unwrap();
+            let mut state = app
+                .world_mut()
+                .get_mut::<CandleState>(candle_entity)
+                .unwrap();
             *state = CandleState::Unlit;
         }
 
