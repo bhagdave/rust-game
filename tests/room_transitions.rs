@@ -294,7 +294,7 @@ fn can_query_room_entities_after_transition() {
     // Query for all rooms
     let room_count = {
         let world = app.world_mut();
-        world.query::<&Room>().iter(&world).count()
+        world.query::<&Room>().iter(world).count()
     };
     assert_eq!(room_count, 1);
 
@@ -313,7 +313,7 @@ fn can_query_room_entities_after_transition() {
     // Query for all rooms after transition
     let room_count = {
         let world = app.world_mut();
-        world.query::<&Room>().iter(&world).count()
+        world.query::<&Room>().iter(world).count()
     };
     assert_eq!(room_count, 1);
 

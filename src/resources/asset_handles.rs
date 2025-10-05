@@ -195,14 +195,12 @@ mod tests {
 
     #[test]
     fn sound_type_variants() {
-        let sounds = vec![
-            SoundType::MatchStrike,
+        let sounds = [SoundType::MatchStrike,
             SoundType::CandleExtinguish,
             SoundType::DoorCreak,
             SoundType::TrapTrigger,
             SoundType::ItemPickup,
-            SoundType::PlayerDeath,
-        ];
+            SoundType::PlayerDeath];
 
         assert_eq!(sounds.len(), 6);
         assert_ne!(sounds[0], sounds[1]);

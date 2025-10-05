@@ -251,7 +251,7 @@ mod tests {
         app.update();
 
         // Verify TrapTriggeredEvent was emitted
-        let mut trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
+        let trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
         let mut reader = trap_events.get_cursor();
         let events: Vec<_> = reader.read(&trap_events).collect();
 
@@ -352,7 +352,7 @@ mod tests {
         app.update();
 
         // Verify no TrapTriggeredEvent was emitted
-        let mut trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
+        let trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
         let mut reader = trap_events.get_cursor();
         let events: Vec<_> = reader.read(&trap_events).collect();
 
@@ -441,7 +441,7 @@ mod tests {
         app.update();
 
         // Verify correct number of TrapTriggeredEvents emitted
-        let mut trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
+        let trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
         let mut reader = trap_events.get_cursor();
         let events: Vec<_> = reader.read(&trap_events).collect();
 
@@ -525,7 +525,7 @@ mod tests {
         app.update();
 
         // Verify all three trap collisions emit events
-        let mut trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
+        let trap_events = app.world_mut().resource_mut::<Events<TrapTriggeredEvent>>();
         let mut reader = trap_events.get_cursor();
         let events: Vec<_> = reader.read(&trap_events).collect();
 

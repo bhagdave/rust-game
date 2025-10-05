@@ -110,7 +110,7 @@ mod tests {
 
         let explored = app.world().get::<Explored>(entity);
         assert!(explored.is_some());
-        assert_eq!(explored.unwrap().0, false);
+        assert!(!explored.unwrap().0);
     }
 
     #[test]
