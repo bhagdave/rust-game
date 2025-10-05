@@ -3,21 +3,30 @@ use rust_game::components::player::Player;
 use rust_game::components::room::{Door, DoorState, Floor, Interactable, Room, TargetRoom};
 use rust_game::resources::game_state::GameState;
 use rust_game::resources::map_state::MapState;
+use rust_game::systems::room_transition::{RoomChangedEvent, room_transition_system};
+use std::time::Duration;
 
-/// Integration test: Room transitions
+/// Integration test: Room transitions using RoomTransitionSystem
 /// Tests that room loading/unloading works correctly when the player
-/// interacts with doors to move between rooms.
+/// transitions between rooms.
 #[test]
 fn room_transition_loads_new_room() {
     // Setup: Create app with minimal plugins
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
 
+    // Add room transition system and events
+    app.add_event::<RoomChangedEvent>();
+    app.add_systems(Update, room_transition_system);
+
     // Insert game resources
     app.insert_resource(GameState {
         current_room: 0,
         player_spawn_point: Vec2::new(100.0, 100.0),
-        ..default()
+        completion_time: Duration::ZERO,
+        collected_secrets: std::collections::HashSet::new(),
+        game_mode: rust_game::resources::game_state::GameMode::Playing,
+        deaths: 0,
     });
     app.insert_resource(MapState::default());
 
@@ -71,81 +80,64 @@ fn room_transition_loads_new_room() {
     let door_target = app.world().get::<TargetRoom>(door_entity).unwrap();
     assert_eq!(door_target.0, 1);
 
-    // Act: Simulate room transition
-    // In a real implementation, this would be triggered by a system
-    // For now, we manually simulate the transition
+    // Verify initial game state
+    {
+        let game_state = app.world().resource::<GameState>();
+        assert_eq!(game_state.current_room, 0);
+    }
 
-    // 1. Despawn Room A entities (would be done by RoomTransitionSystem)
-    app.world_mut().entity_mut(room_a).despawn();
-    app.world_mut().entity_mut(door_entity).despawn();
+    // Act: Trigger room transition using RoomChangedEvent
+    app.world_mut().send_event(RoomChangedEvent {
+        old_room: 0,
+        new_room: 1,
+    });
 
-    // 2. Spawn Room B entities
-    let room_b = app
-        .world_mut()
-        .spawn((
-            Room {
-                id: 1,
-                floor: Floor::Ground,
-                name: "Room B".to_string(),
-            },
-            Name::new("Room B"),
-        ))
-        .id();
-
-    // 3. Update game state to reflect new room
+    // Update game state spawn point for new room
     {
         let mut game_state = app.world_mut().resource_mut::<GameState>();
-        game_state.current_room = 1;
         game_state.player_spawn_point = Vec2::new(300.0, 100.0);
     }
 
-    // 4. Move player to new spawn point
-    {
-        let spawn_point = {
-            let game_state = app.world().resource::<GameState>();
-            game_state.player_spawn_point
-        };
-        let mut player_transform = app.world_mut().get_mut::<Transform>(player_entity).unwrap();
-        player_transform.translation = spawn_point.extend(0.0);
-    }
+    // Run system
+    app.update();
 
-    // 5. Mark room as explored
-    {
-        let mut map_state = app.world_mut().resource_mut::<MapState>();
-        map_state.mark_explored(1);
-    }
+    // Assert: Room A entities despawned by system
+    assert!(
+        app.world().get::<Room>(room_a).is_none(),
+        "Old room should be despawned"
+    );
 
-    // Assert: Room A entities despawned
-    assert!(app.world().get::<Room>(room_a).is_none());
-    assert!(app.world().get::<Door>(door_entity).is_none());
-
-    // Assert: Room B entities spawned
-    assert!(app.world().get::<Room>(room_b).is_some());
-    let new_room = app.world().get::<Room>(room_b).unwrap();
-    assert_eq!(new_room.id, 1);
-    assert_eq!(new_room.name, "Room B");
-
-    // Assert: Player moved to new position
+    // Assert: Player moved to new spawn point by system
     let player_transform = app.world().get::<Transform>(player_entity).unwrap();
     assert_eq!(player_transform.translation.x, 300.0);
     assert_eq!(player_transform.translation.y, 100.0);
 
-    // Assert: Game state updated
+    // Assert: Game state updated by system
     let game_state = app.world().resource::<GameState>();
     assert_eq!(game_state.current_room, 1);
 
-    // Assert: Map state shows room B as explored
+    // Assert: Map state shows room 1 as explored
     let map_state = app.world().resource::<MapState>();
     assert!(map_state.is_visited(1));
 }
 
-/// Test that multiple room transitions work correctly
+/// Test that multiple room transitions work correctly with RoomTransitionSystem
 #[test]
 fn multiple_room_transitions() {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
 
-    app.insert_resource(GameState::default());
+    app.add_event::<RoomChangedEvent>();
+    app.add_systems(Update, room_transition_system);
+
+    app.insert_resource(GameState {
+        current_room: 0,
+        player_spawn_point: Vec2::new(0.0, 0.0),
+        completion_time: Duration::ZERO,
+        collected_secrets: std::collections::HashSet::new(),
+        game_mode: rust_game::resources::game_state::GameMode::Playing,
+        deaths: 0,
+    });
     app.insert_resource(MapState::default());
 
     // Spawn player
@@ -154,45 +146,84 @@ fn multiple_room_transitions() {
         .spawn((Player, Transform::from_xyz(0.0, 0.0, 0.0)))
         .id();
 
-    // Simulate transitions through rooms 0 -> 1 -> 2
-    for room_id in 0..=2 {
-        // Update game state
-        {
-            let mut game_state = app.world_mut().resource_mut::<GameState>();
-            game_state.current_room = room_id;
-            game_state.player_spawn_point = Vec2::new(room_id as f32 * 100.0, 0.0);
-        }
+    // Spawn room entities for rooms 0, 1, 2
+    let room_0 = app
+        .world_mut()
+        .spawn(Room {
+            id: 0,
+            floor: Floor::Ground,
+            name: "Room 0".to_string(),
+        })
+        .id();
 
-        // Move player
-        {
-            let spawn_point = {
-                let game_state = app.world().resource::<GameState>();
-                game_state.player_spawn_point
-            };
-            let mut player_transform = app.world_mut().get_mut::<Transform>(player_entity).unwrap();
-            player_transform.translation = spawn_point.extend(0.0);
-        }
+    let room_1 = app
+        .world_mut()
+        .spawn(Room {
+            id: 1,
+            floor: Floor::First,
+            name: "Room 1".to_string(),
+        })
+        .id();
 
-        // Mark explored
-        {
-            let mut map_state = app.world_mut().resource_mut::<MapState>();
-            map_state.mark_explored(room_id);
-        }
+    let room_2 = app
+        .world_mut()
+        .spawn(Room {
+            id: 2,
+            floor: Floor::Second,
+            name: "Room 2".to_string(),
+        })
+        .id();
+
+    // Transition 0 -> 1
+    {
+        let mut game_state = app.world_mut().resource_mut::<GameState>();
+        game_state.player_spawn_point = Vec2::new(100.0, 0.0);
+    }
+    app.world_mut().send_event(RoomChangedEvent {
+        old_room: 0,
+        new_room: 1,
+    });
+    app.update();
+
+    // Verify room 0 despawned, room 1 still exists
+    assert!(app.world().get::<Room>(room_0).is_none());
+    assert!(app.world().get::<Room>(room_1).is_some());
+    assert!(app.world().get::<Room>(room_2).is_some());
+
+    {
+        let game_state = app.world().resource::<GameState>();
+        assert_eq!(game_state.current_room, 1);
+        let map_state = app.world().resource::<MapState>();
+        assert!(map_state.is_visited(1));
     }
 
-    // Assert: Player is in room 2
-    let game_state = app.world().resource::<GameState>();
-    assert_eq!(game_state.current_room, 2);
+    // Transition 1 -> 2
+    {
+        let mut game_state = app.world_mut().resource_mut::<GameState>();
+        game_state.player_spawn_point = Vec2::new(200.0, 0.0);
+    }
+    app.world_mut().send_event(RoomChangedEvent {
+        old_room: 1,
+        new_room: 2,
+    });
+    app.update();
+
+    // Verify room 1 despawned, room 2 still exists
+    assert!(app.world().get::<Room>(room_1).is_none());
+    assert!(app.world().get::<Room>(room_2).is_some());
+
+    {
+        let game_state = app.world().resource::<GameState>();
+        assert_eq!(game_state.current_room, 2);
+    }
 
     let player_transform = app.world().get::<Transform>(player_entity).unwrap();
     assert_eq!(player_transform.translation.x, 200.0);
 
-    // Assert: All rooms marked as explored
+    // Assert: Rooms 1 and 2 marked as explored
     let map_state = app.world().resource::<MapState>();
-    assert!(map_state.is_visited(0));
     assert!(map_state.is_visited(1));
     assert!(map_state.is_visited(2));
-    assert_eq!(map_state.explored_count(), 3);
 }
 
 /// Test that player position is preserved during room transition
@@ -201,11 +232,18 @@ fn player_position_updates_on_transition() {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
 
+    app.add_event::<RoomChangedEvent>();
+    app.add_systems(Update, room_transition_system);
+
     app.insert_resource(GameState {
         current_room: 0,
         player_spawn_point: Vec2::new(50.0, 50.0),
-        ..default()
+        completion_time: Duration::ZERO,
+        collected_secrets: std::collections::HashSet::new(),
+        game_mode: rust_game::resources::game_state::GameMode::Playing,
+        deaths: 0,
     });
+    app.insert_resource(MapState::default());
 
     let player_entity = app
         .world_mut()
@@ -220,29 +258,26 @@ fn player_position_updates_on_transition() {
     // Transition to new room with different spawn point
     {
         let mut game_state = app.world_mut().resource_mut::<GameState>();
-        game_state.current_room = 1;
         game_state.player_spawn_point = Vec2::new(500.0, 600.0);
     }
 
-    // Move player to spawn point
-    {
-        let spawn_point = {
-            let game_state = app.world().resource::<GameState>();
-            game_state.player_spawn_point
-        };
-        let mut player_transform = app.world_mut().get_mut::<Transform>(player_entity).unwrap();
-        player_transform.translation = spawn_point.extend(0.0);
-    }
+    app.world_mut().send_event(RoomChangedEvent {
+        old_room: 0,
+        new_room: 1,
+    });
 
-    // Verify player moved to new spawn point
+    app.update();
+
+    // Verify player moved to new spawn point by system
     let new_transform = app.world().get::<Transform>(player_entity).unwrap();
     assert_eq!(new_transform.translation.x, 500.0);
     assert_eq!(new_transform.translation.y, 600.0);
 }
 
 /// Test that doors can be locked and prevent transitions
+/// Note: This tests door state, actual prevention logic would be in door interaction system
 #[test]
-fn locked_door_prevents_transition() {
+fn locked_door_state_verification() {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
 
@@ -279,16 +314,27 @@ fn can_query_room_entities_after_transition() {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
 
-    app.insert_resource(GameState::default());
+    app.add_event::<RoomChangedEvent>();
+    app.add_systems(Update, room_transition_system);
+
+    app.insert_resource(GameState {
+        current_room: 0,
+        player_spawn_point: Vec2::new(0.0, 0.0),
+        completion_time: Duration::ZERO,
+        collected_secrets: std::collections::HashSet::new(),
+        game_mode: rust_game::resources::game_state::GameMode::Playing,
+        deaths: 0,
+    });
+    app.insert_resource(MapState::default());
 
     // Spawn room 0
     let room_0 = app
         .world_mut()
-        .spawn((Room {
+        .spawn(Room {
             id: 0,
             floor: Floor::Ground,
             name: "Start Room".to_string(),
-        },))
+        })
         .id();
 
     // Query for all rooms
@@ -298,17 +344,26 @@ fn can_query_room_entities_after_transition() {
     };
     assert_eq!(room_count, 1);
 
-    // Despawn room 0 and spawn room 1 (transition)
-    app.world_mut().entity_mut(room_0).despawn();
-
+    // Spawn room 1 (new room)
     let room_1 = app
         .world_mut()
-        .spawn((Room {
+        .spawn(Room {
             id: 1,
             floor: Floor::First,
             name: "Second Room".to_string(),
-        },))
+        })
         .id();
+
+    // Trigger transition (this will despawn room 0 via system)
+    app.world_mut().send_event(RoomChangedEvent {
+        old_room: 0,
+        new_room: 1,
+    });
+
+    app.update();
+
+    // Room 0 should be despawned by system
+    assert!(app.world().get::<Room>(room_0).is_none());
 
     // Query for all rooms after transition
     let room_count = {
@@ -321,4 +376,84 @@ fn can_query_room_entities_after_transition() {
     let room = app.world().get::<Room>(room_1).unwrap();
     assert_eq!(room.id, 1);
     assert_eq!(room.name, "Second Room");
+}
+
+/// Test that room transition preserves player entity
+#[test]
+fn room_transition_preserves_player() {
+    let mut app = App::new();
+    app.add_plugins(MinimalPlugins);
+
+    app.add_event::<RoomChangedEvent>();
+    app.add_systems(Update, room_transition_system);
+
+    app.insert_resource(GameState {
+        current_room: 0,
+        player_spawn_point: Vec2::new(100.0, 100.0),
+        completion_time: Duration::ZERO,
+        collected_secrets: std::collections::HashSet::new(),
+        game_mode: rust_game::resources::game_state::GameMode::Playing,
+        deaths: 0,
+    });
+    app.insert_resource(MapState::default());
+
+    let player = app.world_mut().spawn((Player, Transform::default())).id();
+
+    // Spawn some room entities
+    app.world_mut().spawn(Room {
+        id: 0,
+        floor: Floor::Ground,
+        name: "Room 0".to_string(),
+    });
+
+    // Trigger multiple transitions
+    for i in 1..=3 {
+        app.world_mut().send_event(RoomChangedEvent {
+            old_room: i - 1,
+            new_room: i,
+        });
+        app.update();
+
+        // Verify player still exists after each transition
+        assert!(
+            app.world().get::<Player>(player).is_some(),
+            "Player should still exist after transition to room {}",
+            i
+        );
+    }
+}
+
+/// Test that map state accumulates explored rooms
+#[test]
+fn map_state_accumulates_explored_rooms() {
+    let mut app = App::new();
+    app.add_plugins(MinimalPlugins);
+
+    app.add_event::<RoomChangedEvent>();
+    app.add_systems(Update, room_transition_system);
+
+    app.insert_resource(GameState {
+        current_room: 0,
+        player_spawn_point: Vec2::new(0.0, 0.0),
+        completion_time: Duration::ZERO,
+        collected_secrets: std::collections::HashSet::new(),
+        game_mode: rust_game::resources::game_state::GameMode::Playing,
+        deaths: 0,
+    });
+    app.insert_resource(MapState::default());
+
+    // Transition through rooms 0 -> 1 -> 2 -> 3
+    for i in 0..3 {
+        app.world_mut().send_event(RoomChangedEvent {
+            old_room: i,
+            new_room: i + 1,
+        });
+        app.update();
+    }
+
+    // Verify all rooms marked as explored
+    let map_state = app.world().resource::<MapState>();
+    assert!(map_state.is_visited(1));
+    assert!(map_state.is_visited(2));
+    assert!(map_state.is_visited(3));
 }
