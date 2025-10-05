@@ -4,4 +4,5 @@ pub mod inventory;
 pub mod player_movement;
 pub mod respawn;
 pub mod room_transition;
+pub mod save_load;
 pub mod trap;
