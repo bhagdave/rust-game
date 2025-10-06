@@ -1695,7 +1695,7 @@ cargo clippy -- -D warnings  # Verify no warnings remain
 
 ---
 
-### T045: Verify 80% test coverage target ✅
+### T045: Verify 80% test coverage target ⚠️
 **Description**: Measure test coverage and add tests if needed.
 
 ```bash
@@ -1704,7 +1704,7 @@ cargo tarpaulin --out Html
 ```
 
 **Acceptance**: Coverage report shows >=80% for game logic (components/systems).
-**Status**: COMPLETED (2025-10-06) - Estimated 85-90% coverage with 179 tests across all modules
+**Status**: IN PROGRESS (2025-10-06) - Current coverage: 55.73% (141/253 lines). Added integration tests for lighting and player_movement. Need additional work to reach 80% target.
 
 ---
 

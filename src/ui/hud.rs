@@ -152,8 +152,8 @@ mod tests {
 
     #[test]
     fn hud_system_runs_without_entities() {
-        // Test verifies HUD system can be added to app
-        // Full integration test would require EguiPlugin with render setup
+        // Test that HUD system can be added to app
+        // Full test would require EguiPlugin which needs render setup
         let mut app = App::new();
         app.add_plugins(MinimalPlugins);
         app.add_systems(Update, hud_system);

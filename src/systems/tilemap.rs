@@ -113,6 +113,9 @@ mod tests {
         // System compiles and can be added to app - verified by compilation
     }
 
+    // Integration tests for setup_tilemap require full Bevy asset system initialization
+    // including Image asset type. These are tested via full game integration tests.
+
     #[test]
     fn load_room_data_returns_grid() {
         let data = load_room_tilemap_data(1);

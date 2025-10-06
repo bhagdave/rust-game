@@ -192,6 +192,118 @@ mod tests {
     }
 
     #[test]
+    fn update_lighting_system_updates_material_from_candle() {
+        let mut app = App::new();
+        app.add_plugins((
+            MinimalPlugins,
+            bevy::asset::AssetPlugin::default(),
+            Material2dPlugin::<LightingMaterial>::default(),
+        ));
+        app.add_systems(Update, update_lighting_system);
+
+        // Create a candle entity
+        app.world_mut().spawn((
+            Transform::from_xyz(50.0, 75.0, 0.0),
+            CandleState::Lit,
+            CandleWax(80.0),
+            VisibilityRadius(120.0),
+        ));
+
+        // Create lighting material and attach to entity
+        let material_handle = {
+            let mut materials = app.world_mut().resource_mut::<Assets<LightingMaterial>>();
+            materials.add(LightingMaterial::default())
+        };
+
+        app.world_mut()
+            .spawn(MeshMaterial2d(material_handle.clone()));
+
+        // Run system
+        app.update();
+
+        // Verify material was updated
+        let materials = app.world().resource::<Assets<LightingMaterial>>();
+        let material = materials.get(&material_handle).unwrap();
+
+        // Material should have been updated with candle position
+        assert_eq!(material.light_position.x, 50.0);
+        assert_eq!(material.light_position.y, 75.0);
+        assert_eq!(material.light_radius, 120.0);
+        // Light should be bright (candle is lit with 80% wax)
+        assert!(material.light_color.alpha > 0.5);
+    }
+
+    #[test]
+    fn lighting_updates_for_unlit_candle() {
+        let mut app = App::new();
+        app.add_plugins((
+            MinimalPlugins,
+            bevy::asset::AssetPlugin::default(),
+            Material2dPlugin::<LightingMaterial>::default(),
+        ));
+        app.add_systems(Update, update_lighting_system);
+
+        // Create an unlit candle
+        app.world_mut().spawn((
+            Transform::from_xyz(0.0, 0.0, 0.0),
+            CandleState::Unlit,
+            CandleWax(50.0),
+            VisibilityRadius(80.0),
+        ));
+
+        let material_handle = {
+            let mut materials = app.world_mut().resource_mut::<Assets<LightingMaterial>>();
+            materials.add(LightingMaterial::default())
+        };
+
+        app.world_mut()
+            .spawn(MeshMaterial2d(material_handle.clone()));
+
+        app.update();
+
+        let materials = app.world().resource::<Assets<LightingMaterial>>();
+        let material = materials.get(&material_handle).unwrap();
+
+        // Unlit candle should have very dim light
+        assert!(material.light_color.alpha < 0.2);
+    }
+
+    #[test]
+    fn lighting_updates_for_extinguished_candle() {
+        let mut app = App::new();
+        app.add_plugins((
+            MinimalPlugins,
+            bevy::asset::AssetPlugin::default(),
+            Material2dPlugin::<LightingMaterial>::default(),
+        ));
+        app.add_systems(Update, update_lighting_system);
+
+        // Create an extinguished candle
+        app.world_mut().spawn((
+            Transform::from_xyz(0.0, 0.0, 0.0),
+            CandleState::Extinguished,
+            CandleWax(0.0),
+            VisibilityRadius(0.0),
+        ));
+
+        let material_handle = {
+            let mut materials = app.world_mut().resource_mut::<Assets<LightingMaterial>>();
+            materials.add(LightingMaterial::default())
+        };
+
+        app.world_mut()
+            .spawn(MeshMaterial2d(material_handle.clone()));
+
+        app.update();
+
+        let materials = app.world().resource::<Assets<LightingMaterial>>();
+        let material = materials.get(&material_handle).unwrap();
+
+        // Extinguished candle should have no light
+        assert_eq!(material.light_color.alpha, 0.0);
+    }
+
+    #[test]
     fn lighting_material_uniform_bindings() {
         // Test verifies correct uniform binding indices
         let material = LightingMaterial {

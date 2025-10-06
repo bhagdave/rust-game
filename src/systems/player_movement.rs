@@ -170,4 +170,110 @@ mod tests {
             "Player should not move when game is paused"
         );
     }
+
+    // Note: Integration tests for movement with input system are complex
+    // and require leafwing-input-manager plugin setup. Testing movement logic
+    // is done through the paused_game_stops_movement test and other unit tests.
+
+    #[test]
+    fn gravity_applies_when_not_grounded() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+
+        app.insert_resource(GameState {
+            current_room: 0,
+            player_spawn_point: Vec2::new(100.0, 100.0),
+            completion_time: std::time::Duration::ZERO,
+            collected_secrets: std::collections::HashSet::new(),
+            game_mode: GameMode::Playing,
+            deaths: 0,
+        });
+
+        app.add_systems(Update, player_movement_system);
+
+        // Player starts with upward velocity while jumping
+        let player_entity = app
+            .world_mut()
+            .spawn((
+                Player,
+                Transform::from_xyz(0.0, 100.0, 0.0),
+                Velocity(Vec2::new(0.0, 100.0)), // upward velocity
+                JumpState::Jumping,
+                InputMap::<PlayerAction>::default(),
+                ActionState::<PlayerAction>::default(),
+            ))
+            .id();
+
+        let initial_velocity = {
+            let vel = app.world().get::<Velocity>(player_entity).unwrap();
+            vel.0.y
+        };
+
+        // Run several updates to let gravity apply
+        app.update();
+        app.update();
+        app.update();
+
+        // Verify velocity decreased due to gravity
+        let final_velocity = {
+            let vel = app.world().get::<Velocity>(player_entity).unwrap();
+            vel.0.y
+        };
+
+        assert!(
+            final_velocity < initial_velocity,
+            "Gravity should reduce upward velocity"
+        );
+    }
+
+
+    #[test]
+    fn player_lands_on_ground_at_y_zero() {
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+
+        app.insert_resource(GameState {
+            current_room: 0,
+            player_spawn_point: Vec2::new(100.0, 100.0),
+            completion_time: std::time::Duration::ZERO,
+            collected_secrets: std::collections::HashSet::new(),
+            game_mode: GameMode::Playing,
+            deaths: 0,
+        });
+
+        app.add_systems(Update, player_movement_system);
+
+        // Player falling below ground level
+        let player_entity = app
+            .world_mut()
+            .spawn((
+                Player,
+                Transform::from_xyz(0.0, -10.0, 0.0), // below y=0
+                Velocity(Vec2::new(0.0, -50.0)),      // falling
+                JumpState::Falling,
+                InputMap::<PlayerAction>::default(),
+                ActionState::<PlayerAction>::default(),
+            ))
+            .id();
+
+        // Run one update
+        app.update();
+
+        // Verify player snapped to ground and stopped falling
+        let transform = app.world().get::<Transform>(player_entity).unwrap();
+        assert_eq!(
+            transform.translation.y, 0.0,
+            "Player should be at ground level"
+        );
+
+        let velocity = app.world().get::<Velocity>(player_entity).unwrap();
+        assert_eq!(velocity.0.y, 0.0, "Player should have no vertical velocity");
+
+        let jump_state = app.world().get::<JumpState>(player_entity).unwrap();
+        assert_eq!(
+            *jump_state,
+            JumpState::Grounded,
+            "Player should be grounded"
+        );
+    }
 }

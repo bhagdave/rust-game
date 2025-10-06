@@ -1,0 +1,228 @@
+[2m2025-10-06T14:34:57.440853Z[0m [32m INFO[0m [2mcargo_tarpaulin::config[0m[2m:[0m Creating config
+[2m2025-10-06T14:34:57.991125Z[0m [32m INFO[0m [2mcargo_tarpaulin[0m[2m:[0m Running Tarpaulin
+[2m2025-10-06T14:34:57.991135Z[0m [32m INFO[0m [2mcargo_tarpaulin[0m[2m:[0m Building project
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.29s
+[2m2025-10-06T14:34:58.595411Z[0m [32m INFO[0m [2mcargo_tarpaulin::process_handling::linux[0m[2m:[0m Launching test
+[2m2025-10-06T14:34:58.595435Z[0m [32m INFO[0m [2mcargo_tarpaulin::process_handling[0m[2m:[0m running /home/dave/Projects/rust-game/target/debug/deps/rust_game-32e41658d1596aab
+
+running 179 tests
+test audio::sound_events::tests::audio_paths_are_correct ... ok
+test audio::sound_events::tests::play_sound_effects_has_all_event_readers ... ok
+test audio::sound_events::tests::play_sound_effects_system_compiles ... ok
+test audio::sound_events::tests::sound_events_integration_test ... ok
+test audio::sound_events::tests::sound_events_plugin_adds_audio_plugin ... ok
+test audio::sound_events::tests::sound_events_plugin_compiles ... ok
+test components::inventory::tests::can_create_collectible_items ... ok
+test components::inventory::tests::can_create_inventory ... ok
+test components::inventory::tests::inventory_capacity ... ok
+test components::inventory::tests::item_variants_compile ... ok
+test components::inventory::tests::key_types_equality ... ok
+test components::lighting::tests::can_create_candle_components ... ok
+test components::lighting::tests::candle_state_transitions ... ok
+test components::lighting::tests::candle_wax_bounds ... ok
+test components::player::tests::can_add_player_components_to_entity ... ok
+test components::player::tests::health_states ... ok
+test components::player::tests::jump_state_transitions ... ok
+test components::puzzle::tests::can_create_puzzle_entity ... ok
+test components::puzzle::tests::circuit_breaker_puzzle_structure ... ok
+test components::puzzle::tests::lever_combination_puzzle_structure ... ok
+test components::puzzle::tests::lever_state_values ... ok
+test components::puzzle::tests::puzzle_reward_cloning ... ok
+test components::puzzle::tests::puzzle_rewards_definable ... ok
+test components::puzzle::tests::puzzle_state_transitions ... ok
+test components::puzzle::tests::puzzle_types_instantiable ... ok
+test components::puzzle::tests::symbol_enum_values ... ok
+test components::puzzle::tests::symbol_match_puzzle_structure ... ok
+test components::room::tests::can_create_door_entity ... ok
+test components::room::tests::can_create_room_entity ... ok
+test components::room::tests::collider_aabb_bounds ... ok
+test components::room::tests::connection_type_comparisons ... ok
+test components::room::tests::door_state_machine_scenario ... ok
+test components::room::tests::door_state_transitions ... ok
+test components::room::tests::door_state_with_different_keys ... ok
+test components::room::tests::door_target_room_component ... ok
+test components::room::tests::floor_enum_comparisons ... ok
+test components::room::tests::interactable_marker_component ... ok
+test components::room::tests::room_connections_can_be_created ... ok
+test components::room::tests::room_connections_component ... ok
+test components::trap::tests::can_create_hazard_entity ... ok
+test components::trap::tests::can_create_trap_entity ... ok
+test components::trap::tests::environmental_hazards_definable ... ok
+test components::trap::tests::hazard_effects_definable ... ok
+test components::trap::tests::trap_state_transitions ... ok
+test components::trap::tests::trap_trigger_types ... ok
+test components::trap::tests::trap_types_definable ... ok
+test resources::asset_handles::tests::can_insert_asset_handles_as_resource ... ok
+test resources::asset_handles::tests::can_retrieve_specific_handles ... ok
+test resources::asset_handles::tests::can_store_audio_handles ... ok
+test resources::asset_handles::tests::can_store_font_handles ... ok
+test resources::asset_handles::tests::can_store_sprite_handles ... ok
+test resources::asset_handles::tests::can_use_in_system ... ok
+test resources::asset_handles::tests::font_type_variants ... ok
+test resources::asset_handles::tests::hash_map_key_equality ... ok
+test resources::asset_handles::tests::sound_type_variants ... ok
+test resources::asset_handles::tests::sprite_type_with_key_variants ... ok
+test resources::asset_handles::tests::sprite_type_with_trap_variants ... ok
+test resources::asset_handles::tests::trap_type_conversion ... ok
+test resources::game_state::tests::can_access_game_state_in_system ... ok
+test resources::game_state::tests::can_insert_game_state_as_resource ... ok
+test resources::game_state::tests::can_modify_game_state ... ok
+test resources::game_state::tests::can_track_collected_secrets ... ok
+test resources::game_state::tests::completion_time_tracking ... ok
+test resources::game_state::tests::death_counter ... ok
+test resources::game_state::tests::game_mode_transitions ... ok
+test resources::input_config::tests::can_create_input_manager_bundle ... ok
+test resources::input_config::tests::default_input_map_contains_all_actions ... ok
+test resources::input_config::tests::input_config_plugin_compiles ... ok
+test resources::input_config::tests::movement_has_multiple_bindings ... ok
+test resources::input_config::tests::player_action_debug_format ... ok
+test resources::input_config::tests::player_action_derives ... ok
+test resources::input_config::tests::player_action_hash_works ... ok
+test resources::map_state::tests::can_access_map_state_in_system ... ok
+test resources::map_state::tests::can_insert_map_state_as_resource ... ok
+test resources::map_state::tests::can_mark_room_explored ... ok
+test resources::map_state::tests::can_set_and_get_layout_data ... ok
+test resources::map_state::tests::can_track_multiple_rooms ... ok
+test resources::map_state::tests::clear_removes_all_exploration_data ... ok
+test resources::map_state::tests::explored_count_tracks_visited_rooms ... ok
+test resources::map_state::tests::get_layout_returns_none_for_unexplored_room ... ok
+test resources::map_state::tests::setting_layout_marks_room_as_visited ... ok
+test resources::map_state::tests::tile_type_can_be_cloned ... ok
+test resources::map_state::tests::tile_type_debug_format ... ok
+test resources::map_state::tests::tile_type_equality ... ok
+test systems::candle_burn::tests::candle_burn_system_compiles ... ok
+test systems::candle_burn::tests::candle_depletes_wax_when_lit ... ok
+test systems::candle_burn::tests::paused_game_stops_candle_burn ... ok
+test systems::candle_burn::tests::unlit_candle_does_not_deplete ... ok
+test systems::candle_burn::tests::visibility_radius_updates_based_on_state ... ok
+test systems::collision::tests::aabb_intersects_corner_overlap ... ok
+test systems::collision::tests::aabb_intersects_detects_no_overlap ... ok
+test systems::collision::tests::aabb_intersects_detects_overlap ... ok
+test systems::collision::tests::aabb_intersects_edge_touching ... ok
+test systems::collision::tests::aabb_intersects_one_inside_other ... ok
+test systems::collision::tests::collision_detection_system_compiles ... ok
+test systems::collision::tests::collision_system_emits_event_for_each_trap_collision ... ok
+test systems::collision::tests::collision_system_multiple_entities ... ok
+test systems::collision::tests::collision_system_no_collision ... ok
+test systems::collision::tests::collision_system_with_player_and_item ... ok
+test systems::collision::tests::collision_system_with_player_and_trap ... ok
+test systems::fixed_timestep::tests::advance_fixed_timestep_helper_doesnt_crash ... ok
+test systems::fixed_timestep::tests::fixed_timestep_configured_at_60hz ... ok
+test systems::fixed_timestep::tests::fixed_timestep_configures_correctly ... ok
+test systems::fixed_timestep::tests::fixed_timestep_independent_of_frame_rate ... ok
+test systems::fixed_timestep::tests::fixed_timestep_plugin_compiles ... ok
+test systems::fixed_timestep::tests::fixed_timestep_resource_exists ... ok
+test systems::fixed_timestep::tests::get_fixed_timestep_returns_default_without_plugin ... ok
+test systems::inventory::tests::inventory_collection_system_compiles ... ok
+test systems::inventory::tests::inventory_usage_system_compiles ... ok
+test systems::inventory::tests::item_collected_event_can_be_sent ... ok
+test systems::inventory::tests::item_usage_system_removes_item_from_inventory ... ok
+test systems::level_loader::tests::entity_spawn_has_required_fields ... ok
+test systems::level_loader::tests::entity_spawn_supports_optional_fields ... ok
+test systems::level_loader::tests::get_level_path_generates_default_path ... ok
+test systems::level_loader::tests::get_level_path_maps_room_zero ... ok
+test systems::level_loader::tests::level_data_structures_deserialize ... ok
+test systems::level_loader::tests::load_level_data_finds_expected_entities ... ok
+test systems::level_loader::tests::load_level_data_handles_invalid_path ... ok
+test systems::level_loader::tests::load_level_data_reads_entry_hall ... ok
+test systems::level_loader::tests::load_level_data_validates_entry_hall_structure ... ok
+test systems::level_loader::tests::load_level_system_compiles ... ok
+test systems::lighting::tests::lighting_material_candle_color ... ok
+test systems::lighting::tests::lighting_material_has_default ... ok
+test systems::lighting::tests::lighting_material_implements_material2d ... ok
+test systems::lighting::tests::lighting_material_uniform_bindings ... ok
+test systems::lighting::tests::lighting_plugin_compiles ... ok
+test systems::lighting::tests::spawn_lighting_overlay_creates_entity ... ok
+test systems::lighting::tests::update_lighting_system_compiles ... ok
+test systems::player_movement::tests::paused_game_stops_movement ... ok
+test systems::player_movement::tests::player_movement_system_compiles ... ok
+test systems::puzzle::tests::circuit_breaker_puzzle_validates_fuse_placement ... ok
+test systems::puzzle::tests::puzzle_interaction_system_compiles ... ok
+test systems::puzzle::tests::puzzle_reward_system_compiles ... ok
+test systems::puzzle::tests::puzzle_reward_unlocks_door ... ok
+test systems::puzzle::tests::puzzle_system_respects_game_mode ... ok
+test systems::puzzle::tests::symbol_match_puzzle_fails_when_sequence_incorrect ... ok
+test systems::puzzle::tests::symbol_match_puzzle_shows_in_progress ... ok
+test systems::puzzle::tests::symbol_match_puzzle_solves_when_sequence_matches ... ok
+test systems::respawn::tests::death_event_adds_death_timer ... ok
+test systems::respawn::tests::death_timer_constant_is_reasonable ... ok
+test systems::respawn::tests::multiple_death_events_handled_correctly ... ok
+test systems::respawn::tests::player_respawns_after_timer_expires ... ok
+test systems::respawn::tests::respawn_preserves_player_entity ... ok
+test systems::respawn::tests::respawn_system_compiles ... ok
+test systems::respawn::tests::respawn_system_graceful_on_invalid_entity ... ok
+test systems::respawn::tests::respawn_timer_ticks_down ... ok
+test systems::room_transition::tests::multiple_room_transitions_work_correctly ... ok
+test systems::room_transition::tests::room_changed_event_updates_game_state ... ok
+test systems::room_transition::tests::room_transition_despawns_old_room_entities ... ok
+test systems::room_transition::tests::room_transition_marks_room_as_explored ... ok
+test systems::room_transition::tests::room_transition_moves_player_to_spawn_point ... ok
+test systems::room_transition::tests::room_transition_system_compiles ... ok
+test systems::save_load::tests::get_save_path_returns_platform_specific_path ... ok
+test systems::save_load::tests::item_serialization_round_trip ... ok
+test systems::save_load::tests::save_data_deserializes_from_ron ... ok
+test systems::save_load::tests::save_data_serializes_to_ron ... ok
+test systems::tilemap::tests::load_room_data_returns_grid ... ok
+test systems::tilemap::tests::tilemap_assigns_wall_and_floor_tiles ... ok
+test systems::tilemap::tests::tilemap_creates_correct_dimensions ... ok
+test systems::tilemap::tests::tilemap_creates_tile_storage ... ok
+test systems::tilemap::tests::tilemap_system_compiles ... ok
+test systems::tilemap::tests::tilemap_uses_correct_texture_path ... ok
+test systems::trap::tests::multiple_trap_events_processed_in_single_update ... ok
+test systems::trap::tests::trap_activation_graceful_on_invalid_entities ... ok
+test systems::trap::tests::trap_activation_handles_multiple_traps ... ok
+test systems::trap::tests::trap_activation_only_affects_specified_player ... ok
+test systems::trap::tests::trap_activation_sends_death_event ... ok
+test systems::trap::tests::trap_activation_system_compiles ... ok
+test systems::trap::tests::trap_triggered_event_kills_player ... ok
+test ui::hud::tests::hud_calculates_wax_percentage ... ok
+test ui::hud::tests::hud_displays_match_count_correctly ... ok
+test ui::hud::tests::hud_handles_empty_inventory ... ok
+test ui::hud::tests::hud_handles_mixed_inventory ... ok
+test ui::hud::tests::hud_plugin_adds_hud_system ... ok
+test ui::hud::tests::hud_plugin_compiles ... ok
+test ui::hud::tests::hud_system_compiles ... ok
+test ui::hud::tests::hud_system_reads_candle_wax ... ok
+test ui::hud::tests::hud_system_reads_inventory ... ok
+test ui::hud::tests::hud_system_runs_without_entities ... ok
+
+test result: ok. 179 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.05s
+
+[2m2025-10-06T14:35:32.273502Z[0m [32m INFO[0m [2mcargo_tarpaulin::report[0m[2m:[0m Coverage Results:
+|| Uncovered Lines:
+|| src/audio/sound_events.rs: 79-80, 85-86, 91-92, 97-98, 103-104, 109-110, 115-116, 121-122, 126-127, 132-133
+|| src/resources/asset_handles.rs: 57
+|| src/resources/game_state.rs: 45
+|| src/resources/map_state.rs: 48, 51, 66, 69, 73
+|| src/systems/candle_burn.rs: 41-42
+|| src/systems/collision.rs: 83
+|| src/systems/fixed_timestep.rs: 94
+|| src/systems/level_loader.rs: 118, 142, 150-152, 156-158, 169-170, 176-177
+|| src/systems/lighting.rs: 36, 42, 81, 87-88, 91, 93, 96, 99, 102-103
+|| src/systems/player_movement.rs: 36, 39, 42, 47, 50-51, 59, 72-73, 77-78, 90-93
+|| src/systems/puzzle.rs: 140, 156, 159, 190-191, 208, 228-229, 260, 262
+|| src/systems/save_load.rs: 497, 503, 511, 516, 518, 527, 531-534, 540, 548, 561-562
+|| src/systems/tilemap.rs: 21, 33, 36, 40-42, 46, 52-53, 61, 69, 73-74, 84, 97
+|| src/ui/hud.rs: 45, 51, 55, 59, 61, 63, 72, 74, 77, 85, 87, 92-96, 99, 109, 111-115, 118
+|| Tested/Total Lines:
+|| src/audio/sound_events.rs: 11/31 +0.00%
+|| src/resources/asset_handles.rs: 0/1 +0.00%
+|| src/resources/game_state.rs: 0/1 -100.00%
+|| src/resources/input_config.rs: 2/2 +33.33%
+|| src/resources/map_state.rs: 6/11 -18.18%
+|| src/systems/candle_burn.rs: 8/10 -20.00%
+|| src/systems/collision.rs: 9/10 +0.00%
+|| src/systems/fixed_timestep.rs: 4/5 -20.00%
+|| src/systems/inventory.rs: 5/5 +0.00%
+|| src/systems/level_loader.rs: 8/20 +0.00%
+|| src/systems/lighting.rs: 1/12 +2.45%
+|| src/systems/player_movement.rs: 2/17 +0.00%
+|| src/systems/puzzle.rs: 28/38 -7.89%
+|| src/systems/respawn.rs: 12/12 +0.00%
+|| src/systems/room_transition.rs: 9/9 +0.00%
+|| src/systems/save_load.rs: 8/22 -45.45%
+|| src/systems/tilemap.rs: 0/15 +0.00%
+|| src/systems/trap.rs: 7/7 +0.00%
+|| src/ui/hud.rs: 1/25 +0.00%
+|| 
+47.83% coverage, 121/253 lines covered, -13.40% change in coverage
