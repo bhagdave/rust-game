@@ -226,7 +226,6 @@ mod tests {
         );
     }
 
-
     #[test]
     fn player_lands_on_ground_at_y_zero() {
         let mut app = App::new();
