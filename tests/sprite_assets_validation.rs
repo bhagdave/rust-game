@@ -153,8 +153,8 @@ fn sprites_have_reasonable_file_sizes() {
     ];
 
     for (sprite_path, min_size, max_size) in sprites {
-        let metadata =
-            fs::metadata(sprite_path).unwrap_or_else(|_| panic!("Should get metadata for {}", sprite_path));
+        let metadata = fs::metadata(sprite_path)
+            .unwrap_or_else(|_| panic!("Should get metadata for {}", sprite_path));
         let size = metadata.len();
 
         assert!(
@@ -181,8 +181,8 @@ fn sprites_are_not_empty() {
     ];
 
     for sprite_path in sprites {
-        let metadata =
-            fs::metadata(sprite_path).unwrap_or_else(|_| panic!("Should get metadata for {}", sprite_path));
+        let metadata = fs::metadata(sprite_path)
+            .unwrap_or_else(|_| panic!("Should get metadata for {}", sprite_path));
         let size = metadata.len();
 
         assert!(size > 0, "{} should not be empty", sprite_path);
