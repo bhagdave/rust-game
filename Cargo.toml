@@ -43,3 +43,8 @@ opt-level = 1
 [profile.dev.package."*"]
 opt-level = 3
 
+# Benchmark configuration
+[[bench]]
+name = "lighting_bench"
+harness = false
+

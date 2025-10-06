@@ -1598,9 +1598,10 @@ pub fn load_level(
 
 ## Phase 3.8: Polish & Performance
 
-### T041: [P] Add performance benchmarks for lighting system
+### T041: [X] ✅ Add performance benchmarks for lighting system - COMPLETED
 **File**: `benches/lighting_bench.rs`
 **Description**: Benchmark lighting shader performance using criterion.
+**Status**: ✅ COMPLETED - Comprehensive benchmark suite implemented with 6 benchmark groups and 9 unit tests
 
 ```rust
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
