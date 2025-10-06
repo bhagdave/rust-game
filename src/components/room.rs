@@ -1,72 +1,134 @@
 use crate::components::inventory::KeyType;
 use bevy::prelude::*;
 
+/// Type alias for room identification.
+///
+/// Rooms are referenced by unique numeric IDs throughout the game.
 pub type RoomId = usize;
 
+/// Component defining a room in the game world.
+///
+/// Each room represents a distinct area of the house with its own
+/// layout, connections, and properties.
 #[derive(Component)]
 pub struct Room {
+    /// Unique identifier for this room
     pub id: RoomId,
+    /// Which floor of the house this room is on
     pub floor: Floor,
+    /// Display name of the room (e.g., "Entry Hall", "Library")
     pub name: String,
 }
 
+/// Floors in the house where rooms can be located.
 #[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Floor {
+    /// Ground floor (main entrance level)
     Ground,
+    /// First floor (one level up)
     First,
+    /// Second floor (top level)
     Second,
+    /// Basement (below ground)
     Basement,
 }
 
+/// Component defining the spatial boundaries of a room.
+///
+/// Used for camera bounds and determining when the player enters/exits a room.
 #[derive(Component)]
 pub struct RoomBounds {
+    /// Minimum (bottom-left) corner position
     pub min: Vec2,
+    /// Maximum (top-right) corner position
     pub max: Vec2,
 }
 
+/// Component listing all connections from a room to other rooms.
+///
+/// Connections can be doors, staircases, ladders, or hidden passages.
 #[derive(Component)]
 pub struct RoomConnections(pub Vec<RoomConnection>);
 
+/// Data structure describing a connection between two rooms.
+///
+/// Defines how rooms link together and any requirements (like keys) to traverse.
 #[derive(Clone)]
 pub struct RoomConnection {
+    /// ID of the room this connection leads to
     pub target_room: RoomId,
+    /// Type of connection (door, stairs, etc.)
     pub connection_type: ConnectionType,
+    /// World position of the connection point
     pub position: Vec2,
+    /// Optional key requirement to unlock this connection
     pub locked: Option<KeyType>,
 }
 
+/// Types of connections between rooms.
 #[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum ConnectionType {
+    /// Standard door between rooms
     Door,
+    /// Staircase connecting floors
     Staircase,
+    /// Ladder for vertical movement
     Ladder,
+    /// Hidden passage revealed by puzzles or secrets
     Hidden,
 }
 
+/// Component tracking whether a room has been visited by the player.
+///
+/// Used for map system and achievement tracking.
 #[derive(Component)]
 pub struct Explored(pub bool);
 
+/// Component defining an axis-aligned bounding box for collision.
+///
+/// Used for walls, platforms, and static obstacles.
 #[derive(Component)]
 pub struct Collider {
+    /// Minimum (bottom-left) corner of collision box
     pub min: Vec2,
+    /// Maximum (top-right) corner of collision box
     pub max: Vec2,
 }
 
+/// Marker component for door entities.
+///
+/// Doors can be locked, unlocked, or open and lead to other rooms.
 #[derive(Component)]
 pub struct Door;
 
+/// Component tracking the current state of a door.
+///
+/// State transitions:
+/// - `Locked(key)` -> `Unlocked` (when player uses matching key)
+/// - `Unlocked` -> `Open` (when player interacts)
+/// - `Open` -> Player transitions to `TargetRoom`
 #[derive(Component, Debug, PartialEq)]
 pub enum DoorState {
+    /// Door is locked and requires specific key type
     Locked(KeyType),
+    /// Door is unlocked but not yet opened
     Unlocked,
+    /// Door is open and player can pass through
     Open,
 }
 
+/// Component specifying which room a door leads to.
+///
+/// Used by the room transition system to load the target room
+/// when the player passes through.
 #[derive(Component)]
 pub struct TargetRoom(pub RoomId);
 
+/// Marker component indicating an entity can be interacted with by the player.
+///
+/// Entities with this component respond to the interact action (F key).
 #[derive(Component)]
-pub struct Interactable; // marker for player interaction
+pub struct Interactable;
 
 #[cfg(test)]
 mod tests {

@@ -2,60 +2,113 @@ use crate::components::inventory::Item;
 use crate::components::room::RoomId;
 use bevy::prelude::*;
 
+/// Component defining the type and data for a puzzle.
+///
+/// Puzzles block progression until solved. Each variant contains
+/// puzzle-specific data needed for validation and interaction.
 #[derive(Component)]
 pub enum Puzzle {
+    /// Electrical circuit puzzle requiring fuses in correct order
     CircuitBreaker(CircuitBreakerPuzzle),
+    /// Weight-based puzzle requiring items on plates
     PressurePlate(PressurePlatePuzzle),
+    /// Pattern matching puzzle with symbols
     SymbolMatch(SymbolMatchPuzzle),
+    /// Light reflection puzzle (no additional data needed)
     MirrorReflection,
+    /// Lever combination puzzle requiring correct switch positions
     LeverCombination(LeverCombinationPuzzle),
 }
 
+/// Component tracking the current state of a puzzle.
+///
+/// State transitions:
+/// - `Unsolved` -> `InProgress` (when player starts interacting)
+/// - `InProgress` -> `Solved` (when correct solution achieved)
+/// - `InProgress` -> `Unsolved` (when player resets or gives up)
 #[derive(Component, Debug, PartialEq)]
 pub enum PuzzleState {
+    /// Puzzle has not been attempted
     Unsolved,
+    /// Player is currently working on puzzle
     InProgress,
+    /// Puzzle has been successfully completed
     Solved,
 }
 
+/// Component defining what reward is granted when puzzle is solved.
+///
+/// Rewards are applied immediately upon puzzle completion.
 #[derive(Component, Clone)]
 pub enum PuzzleReward {
+    /// Unlocks a door to specified room
     UnlockDoor(RoomId),
+    /// Reveals a hidden passage to specified room
     RevealPassage(RoomId),
+    /// Spawns an item for the player to collect
     SpawnItem(Item),
 }
 
+/// Data for circuit breaker puzzle requiring fuses in correct sequence.
+///
+/// Player must insert fuses (entities) into slots in the correct order
+/// specified by `correct_sequence`.
 pub struct CircuitBreakerPuzzle {
+    /// Fuse slots that can contain fuse entities (None = empty slot)
     pub fuse_slots: Vec<Option<Entity>>,
+    /// Indices representing correct fuse placement order
     pub correct_sequence: Vec<usize>,
 }
 
+/// Data for pressure plate puzzle requiring weighted items.
+///
+/// Player must place specific items on plates to activate the mechanism.
 pub struct PressurePlatePuzzle {
+    /// Pressure plate entities in the puzzle
     pub plates: Vec<Entity>,
+    /// Item entities that must be placed on plates
     pub required_items: Vec<Entity>,
 }
 
+/// Symbol types used in symbol matching puzzles.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Symbol {
+    /// Circle symbol
     Circle,
+    /// Triangle symbol
     Triangle,
+    /// Square symbol
     Square,
+    /// Star symbol
     Star,
 }
 
+/// Data for symbol matching puzzle requiring pattern recreation.
+///
+/// Player must input the correct sequence of symbols to solve.
 pub struct SymbolMatchPuzzle {
+    /// Symbols player has input so far
     pub input_sequence: Vec<Symbol>,
+    /// Required symbol sequence to solve puzzle
     pub correct_sequence: Vec<Symbol>,
 }
 
+/// State of a lever in lever combination puzzles.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum LeverState {
+    /// Lever is in up position
     Up,
+    /// Lever is in down position
     Down,
 }
 
+/// Data for lever combination puzzle requiring correct lever positions.
+///
+/// Player must set all levers to their correct up/down states.
 pub struct LeverCombinationPuzzle {
+    /// Lever entities in the puzzle
     pub levers: Vec<Entity>,
+    /// Required states for each lever to solve puzzle
     pub correct_states: Vec<LeverState>,
 }
 

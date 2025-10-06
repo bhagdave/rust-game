@@ -14,33 +14,31 @@ use std::path::PathBuf;
 /// This structure contains all the necessary game state that needs to be
 /// persisted across sessions. It uses RON (Rusty Object Notation) format
 /// for human-readable serialization.
-///
-/// # Fields
-/// * `version` - Save file format version (currently 1)
-/// * `current_room` - The room ID where the player is located
-/// * `player_position` - Player's XY coordinates in the current room
-/// * `inventory_items` - Serialized list of inventory items
-/// * `candle_wax` - Current candle wax percentage (0.0-100.0)
-/// * `candle_state` - Current state of the candle (Lit, Unlit, Extinguished)
-/// * `explored_rooms` - List of room IDs that have been visited
-/// * `completion_time_secs` - Total game time in seconds
-/// * `deaths` - Number of times the player has died
-/// * `collected_secrets` - Number of secret items collected
-/// * `double_jump_unlocked` - Whether the double jump ability has been acquired
-/// * `game_mode` - Current game mode (Menu, Playing, Paused, etc.)
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SaveData {
+    /// Save file format version (currently 1)
     pub version: u32,
+    /// The room ID where the player is located
     pub current_room: RoomId,
+    /// Player's XY coordinates in the current room
     pub player_position: (f32, f32),
+    /// Serialized list of inventory items
     pub inventory_items: Vec<SerializedItem>,
+    /// Current candle wax percentage (0.0-100.0)
     pub candle_wax: f32,
+    /// Current state of the candle (Lit, Unlit, Extinguished)
     pub candle_state: SerializedCandleState,
+    /// List of room IDs that have been visited
     pub explored_rooms: Vec<RoomId>,
+    /// Total game time in seconds
     pub completion_time_secs: u64,
+    /// Number of times the player has died
     pub deaths: u32,
+    /// Number of secret items collected
     pub collected_secrets: usize,
+    /// Whether the double jump ability has been acquired
     pub double_jump_unlocked: bool,
+    /// Current game mode (Menu, Playing, Paused, etc.)
     pub game_mode: SerializedGameMode,
 }
 
@@ -50,54 +48,88 @@ pub struct SaveData {
 /// Entity references in the original are not serialized.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum SerializedItem {
+    /// Match item for lighting candles
     Match,
+    /// Key item of specific type
     Key(SerializedKeyType),
+    /// Tool item of specific type
     Tool(SerializedToolType),
+    /// Puzzle-specific item
     PuzzleItem(SerializedPuzzleItemType),
+    /// Special item that unlocks double jump
     DoubleJumpItem,
+    /// Diary page with page number
     DiaryPage(usize),
 }
 
+/// Serializable key types for save system
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum SerializedKeyType {
+    /// Common brass key
     Brass,
+    /// Iron key for sturdy locks
     Iron,
+    /// Decorative ornate key
     Ornate,
+    /// Master key that opens multiple locks
     Master,
 }
 
+/// Serializable tool types for save system
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum SerializedToolType {
+    /// Wrench for mechanical puzzles
     Wrench,
+    /// Crowbar for prying objects
     Crowbar,
+    /// Wire cutters for electrical puzzles
     WireCutters,
+    /// Magnet for attracting metal objects
     Magnet,
+    /// Oil can for lubricating mechanisms
     OilCan,
+    /// Ladder for reaching high places
     Ladder,
 }
 
+/// Serializable puzzle item types for save system
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum SerializedPuzzleItemType {
+    /// Fuse for circuit breaker puzzles
     Fuse,
+    /// Red gemstone for matching puzzles
     GemstoneRed,
+    /// Green gemstone for matching puzzles
     GemstoneGreen,
+    /// Blue gemstone for matching puzzles
     GemstoneBlue,
+    /// Electronic component for circuit puzzles
     CircuitComponent,
 }
 
+/// Serializable candle state for save system
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum SerializedCandleState {
+    /// Candle has not been lit yet
     Unlit,
+    /// Candle is currently burning
     Lit,
+    /// Candle wax is depleted or was put out
     Extinguished,
 }
 
+/// Serializable game mode for save system
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum SerializedGameMode {
+    /// Main menu screen
     Menu,
+    /// Active gameplay
     Playing,
+    /// Game paused by player
     Paused,
+    /// Player died or failed
     GameOver,
+    /// Player successfully escaped
     Victory,
 }
 
@@ -124,15 +156,14 @@ pub struct AutoSaveEvent;
 /// the player manually triggers a save.
 #[derive(Event)]
 pub struct ManualSaveEvent {
+    /// Save slot number to save to
     pub slot: usize,
 }
 
 /// Event triggered when a save file should be loaded
-///
-/// # Fields
-/// * `slot` - Save slot number to load (0 for auto-save)
 #[derive(Event)]
 pub struct LoadGameEvent {
+    /// Save slot number to load (0 for auto-save)
     pub slot: usize,
 }
 

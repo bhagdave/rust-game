@@ -25,7 +25,9 @@ use bevy::prelude::*;
 /// ```
 #[derive(Event)]
 pub struct RoomChangedEvent {
+    /// ID of the room the player is leaving
     pub old_room: RoomId,
+    /// ID of the room the player is entering
     pub new_room: RoomId,
 }
 

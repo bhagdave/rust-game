@@ -4,28 +4,52 @@ use bevy::prelude::*;
 use bevy_kira_audio::AudioSource;
 use std::collections::HashMap;
 
+/// Resource storing handles to all loaded game assets.
+///
+/// Centralizes asset management by storing handles for sprites, audio,
+/// and fonts. Systems can access this resource to get handles without
+/// repeatedly loading assets.
 #[derive(Resource, Default)]
 pub struct AssetHandles {
+    /// Map of sprite types to their image handles
     pub sprites: HashMap<SpriteType, Handle<Image>>,
+    /// Map of sound types to their audio source handles
     pub audio: HashMap<SoundType, Handle<AudioSource>>,
+    /// Map of font types to their font handles
     pub fonts: HashMap<FontType, Handle<Font>>,
 }
 
+/// Enum identifying different sprite assets in the game.
+///
+/// Used as keys in the sprite handle map to retrieve specific textures.
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
 pub enum SpriteType {
+    /// Player character sprite
     Player,
+    /// Candle sprite
     Candle,
+    /// Match item sprite
     Match,
+    /// Key sprite (variant for each key type)
     Key(KeyType),
+    /// Trap sprite (variant for each trap type)
     Trap(TrapType),
 }
 
+/// Enum identifying different trap sprite variants.
+///
+/// Separate from `Trap` component to allow serialization and use as HashMap key.
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
 pub enum TrapType {
+    /// Spikes trap sprite
     Spikes,
+    /// Falling chandelier trap sprite
     FallingChandelier,
+    /// Collapsing floor trap sprite
     CollapsingFloor,
+    /// Pendulum trap sprite
     Pendulum,
+    /// Arrow trap sprite
     ArrowTrap,
 }
 
@@ -41,19 +65,33 @@ impl From<Trap> for TrapType {
     }
 }
 
+/// Enum identifying different sound effect assets.
+///
+/// Used as keys in the audio handle map to retrieve specific sounds.
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
 pub enum SoundType {
+    /// Sound when lighting a match
     MatchStrike,
+    /// Sound when candle is extinguished
     CandleExtinguish,
+    /// Sound of door opening/closing
     DoorCreak,
+    /// Sound when trap is triggered
     TrapTrigger,
+    /// Sound when picking up an item
     ItemPickup,
+    /// Sound when player dies
     PlayerDeath,
 }
 
+/// Enum identifying different font assets.
+///
+/// Used as keys in the font handle map to retrieve specific fonts.
 #[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
 pub enum FontType {
+    /// Standard UI font for HUD and menus
     UI,
+    /// Title font for headings and important text
     Title,
 }
 

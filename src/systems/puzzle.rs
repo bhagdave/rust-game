@@ -8,9 +8,6 @@ use bevy::prelude::*;
 /// This event is triggered when the player attempts to interact with a puzzle
 /// element (e.g., pressing a pressure plate, flipping a lever, inputting a symbol).
 ///
-/// # Fields
-/// * `puzzle` - The entity representing the puzzle being interacted with
-///
 /// # Examples
 /// ```ignore
 /// fn player_input_system(
@@ -27,6 +24,7 @@ use bevy::prelude::*;
 /// ```
 #[derive(Event)]
 pub struct PuzzleInteractEvent {
+    /// The entity representing the puzzle being interacted with
     pub puzzle: Entity,
 }
 
@@ -34,10 +32,6 @@ pub struct PuzzleInteractEvent {
 ///
 /// This event triggers reward application (unlocking doors, spawning items, etc.)
 /// and can be used by other systems (audio, UI) to provide feedback.
-///
-/// # Fields
-/// * `puzzle` - The entity representing the solved puzzle
-/// * `reward` - The reward to be applied when the puzzle is solved
 ///
 /// # Examples
 /// ```ignore
@@ -57,7 +51,9 @@ pub struct PuzzleInteractEvent {
 /// ```
 #[derive(Event)]
 pub struct PuzzleSolvedEvent {
+    /// The entity representing the solved puzzle
     pub puzzle: Entity,
+    /// The reward to be applied when the puzzle is solved
     pub reward: PuzzleReward,
 }
 

@@ -1,44 +1,88 @@
 use bevy::prelude::*;
 
+/// Component defining the type of trap.
+///
+/// Each trap type has unique visual representation and activation behavior.
+/// Traps are triggered by their associated `TrapTrigger` component.
 #[derive(Component)]
 pub enum Trap {
+    /// Floor spikes that emerge when triggered
     Spikes,
+    /// Chandelier that falls from ceiling
     FallingChandelier,
+    /// Floor section that collapses beneath the player
     CollapsingFloor,
+    /// Swinging blade pendulum
     Pendulum,
+    /// Wall-mounted arrow launcher
     ArrowTrap,
 }
 
+/// Component defining how a trap is activated.
+///
+/// Determines the conditions under which a trap transitions from
+/// `Armed` to `Triggered` state.
 #[derive(Component)]
 pub enum TrapTrigger {
+    /// Activates when player steps on pressure plate
     PressurePlate,
-    Proximity(f32), // radius
-    Timed(f32),     // duration
+    /// Activates when player enters radius (in pixels)
+    Proximity(f32),
+    /// Activates after duration (in seconds)
+    Timed(f32),
 }
 
+/// Component tracking the current state of a trap.
+///
+/// State transitions:
+/// - `Armed` -> `Triggered` (when trigger condition met)
+/// - `Triggered` -> `Resetting` (after trap executes)
+/// - `Resetting` -> `Armed` (when reset complete)
 #[derive(Component, Debug, PartialEq)]
 pub enum TrapState {
+    /// Trap is ready to be triggered
     Armed,
+    /// Trap has been activated and is executing
     Triggered,
+    /// Trap is resetting to armed state
     Resetting,
 }
 
+/// Marker component indicating a trap causes instant death on contact.
+///
+/// When present, collision with this trap immediately sets player health to `Dead`.
 #[derive(Component)]
-pub struct InstantDeath; // marker for instant kill
+pub struct InstantDeath;
 
+/// Component defining environmental hazards in the game world.
+///
+/// Unlike traps, hazards are static elements that affect gameplay
+/// through their associated `HazardEffect` component.
 #[derive(Component)]
 pub enum EnvironmentalHazard {
+    /// Open window that creates drafts
     DraftyWindow,
+    /// Puddle of water on floor
     WaterPuddle,
+    /// Damaged floor section
     BrokenFloor,
+    /// Spinning fan blade
     FanBlade,
+    /// Steam vent that releases periodic bursts
     SteamVent,
 }
 
+/// Component defining the gameplay effect of an environmental hazard.
+///
+/// Applied to the player when they interact with the associated
+/// `EnvironmentalHazard` component.
 #[derive(Component)]
 pub enum HazardEffect {
+    /// Extinguishes the player's candle
     ExtinguishCandle,
+    /// Reduces player movement speed
     SlowMovement,
+    /// Causes damage when falling through
     FallDamage,
 }
 

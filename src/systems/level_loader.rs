@@ -13,24 +13,22 @@ use crate::components::room::{ConnectionType, Floor};
 /// Represents a complete room definition including metadata, tile layout,
 /// entity spawns, and connections to other rooms.
 ///
-/// # Fields
-/// - `id`: Unique room identifier
-/// - `floor`: Floor level (Ground, First, Second, Basement)
-/// - `name`: Human-readable room name
-/// - `bounds`: Room boundaries in world coordinates
-/// - `tiles`: 2D grid of tile indices for floor/wall layout
-/// - `entities`: List of entities to spawn in the room
-/// - `connections`: List of connections to other rooms (doors, stairs, etc.)
-///
 /// From tasks.md T039: "Load room data from RON files"
 #[derive(Deserialize, Debug, Clone)]
 pub struct LevelData {
+    /// Unique room identifier
     pub id: usize,
+    /// Floor level (Ground, First, Second, Basement)
     pub floor: Floor,
+    /// Human-readable room name
     pub name: String,
+    /// Room boundaries in world coordinates
     pub bounds: Bounds,
+    /// 2D grid of tile indices for floor/wall layout
     pub tiles: Vec<Vec<u32>>,
+    /// List of entities to spawn in the room
     pub entities: Vec<EntitySpawn>,
+    /// List of connections to other rooms (doors, stairs, etc.)
     pub connections: Vec<RoomConnection>,
 }
 
@@ -40,7 +38,9 @@ pub struct LevelData {
 /// Used for collision detection and camera bounds.
 #[derive(Deserialize, Debug, Clone)]
 pub struct Bounds {
+    /// Minimum (bottom-left) corner coordinates (x, y)
     pub min: (f32, f32),
+    /// Maximum (top-right) corner coordinates (x, y)
     pub max: (f32, f32),
 }
 
@@ -48,21 +48,19 @@ pub struct Bounds {
 ///
 /// Represents an entity to be spawned in the room with its type and position.
 /// Optional fields support different entity types (doors, keys, etc.).
-///
-/// # Fields
-/// - `entity_type`: String identifier for entity type (e.g., "Match", "Key", "Door")
-/// - `position`: (x, y) coordinates in world space
-/// - `target_room`: Optional room ID for doors/portals
-/// - `locked`: Optional key type for locked doors
-/// - `key_type`: Optional key type identifier for key entities
 #[derive(Deserialize, Debug, Clone)]
 pub struct EntitySpawn {
+    /// String identifier for entity type (e.g., "Match", "Key", "Door")
     pub entity_type: String,
+    /// Position coordinates (x, y) in world space
     pub position: (f32, f32),
+    /// Optional room ID for doors/portals
     #[serde(default)]
     pub target_room: Option<usize>,
+    /// Optional key type for locked doors
     #[serde(default)]
     pub locked: Option<KeyType>,
+    /// Optional key type identifier for key entities
     #[serde(default)]
     pub key_type: Option<KeyType>,
 }
@@ -73,9 +71,13 @@ pub struct EntitySpawn {
 /// Used to build the room graph for navigation.
 #[derive(Deserialize, Debug, Clone)]
 pub struct RoomConnection {
+    /// ID of the room this connection leads to
     pub target_room: usize,
+    /// Type of connection (Door, Staircase, Ladder, Hidden)
     pub connection_type: ConnectionType,
+    /// Position coordinates (x, y) in world space
     pub position: (f32, f32),
+    /// Optional key type required to unlock this connection
     pub locked: Option<KeyType>,
 }
 

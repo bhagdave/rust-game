@@ -5,22 +5,30 @@ use std::collections::HashMap;
 /// Resource for tracking explored rooms and their layout data
 #[derive(Resource, Default)]
 pub struct MapState {
+    /// Map of room IDs to their exploration status
     pub explored_rooms: HashMap<RoomId, ExploredStatus>,
 }
 
 /// Status of a room's exploration
 pub struct ExploredStatus {
+    /// Whether the room has been visited by the player
     pub visited: bool,
-    pub layout_data: Option<Vec<Vec<TileType>>>, // 2D grid
+    /// Optional 2D grid layout data for the room
+    pub layout_data: Option<Vec<Vec<TileType>>>,
 }
 
 /// Types of tiles that can be displayed on the map
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum TileType {
+    /// Walkable floor tile
     Floor,
+    /// Solid wall tile
     Wall,
+    /// Door tile
     Door,
+    /// Trap tile
     Trap,
+    /// Item tile
     Item,
 }
 

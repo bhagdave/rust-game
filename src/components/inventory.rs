@@ -1,51 +1,92 @@
 use bevy::prelude::*;
 
+/// Component storing a collection of items with capacity limit.
+///
+/// Attached to entities (typically the player) that can carry items.
+/// Attempting to add items beyond `max_capacity` should be rejected.
 #[derive(Component)]
 pub struct Inventory {
+    /// Items currently in the inventory
     pub items: Vec<Item>,
+    /// Maximum number of items that can be carried
     pub max_capacity: usize,
 }
 
+/// Component representing a collectible item in the game.
+///
+/// Can exist as a world entity (with `Collectible` marker) or within
+/// an `Inventory` component.
 #[derive(Component, Clone)]
 pub enum Item {
+    /// Match used to light candles
     Match,
+    /// Key of specific type for unlocking doors
     Key(KeyType),
+    /// Tool for puzzle solving or interaction
     Tool(ToolType),
+    /// Item required for specific puzzles
     PuzzleItem(PuzzleItemType),
+    /// Special item that unlocks double jump ability
     DoubleJumpItem,
+    /// Story page with associated page number
     DiaryPage(usize),
 }
 
+/// Types of keys for unlocking different doors.
+///
+/// Each key type corresponds to specific doors in the game world.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 pub enum KeyType {
+    /// Common brass key
     Brass,
+    /// Iron key for sturdy locks
     Iron,
+    /// Decorative ornate key
     Ornate,
+    /// Master key that opens multiple locks
     Master,
 }
 
+/// Types of tools used for various interactions and puzzles.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ToolType {
+    /// Wrench for mechanical puzzles
     Wrench,
+    /// Crowbar for prying objects
     Crowbar,
+    /// Wire cutters for electrical puzzles
     WireCutters,
+    /// Magnet for attracting metal objects
     Magnet,
+    /// Oil can for lubricating mechanisms
     OilCan,
+    /// Ladder for reaching high places
     Ladder,
 }
 
+/// Types of items specifically used in puzzles.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PuzzleItemType {
+    /// Fuse for circuit breaker puzzles
     Fuse,
+    /// Colored gemstone for matching puzzles
     Gemstone(Color),
+    /// Electronic component for circuit puzzles
     CircuitComponent,
 }
 
+/// Component indicating an item can stack (multiple of same item).
+///
+/// Contains the current stack count. Used for items like matches
+/// where players can carry multiple.
 #[derive(Component)]
-pub struct StackableItem(pub u32); // stack count
+pub struct StackableItem(pub u32);
 
+/// Marker component indicating an entity can be picked up by the player.
+///
+/// Entities with this component are added to player inventory on interaction.
 #[derive(Component)]
-pub struct Collectible; // marker for pickup
+pub struct Collectible;
 
 #[cfg(test)]
 mod tests {

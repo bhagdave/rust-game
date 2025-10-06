@@ -1,22 +1,39 @@
 use bevy::prelude::*;
 use leafwing_input_manager::prelude::*;
 
+/// Enum defining all player input actions in the game.
+///
+/// Used with `leafwing_input_manager` to map keyboard/gamepad inputs
+/// to game actions. Each action can have multiple key bindings.
 #[derive(Actionlike, PartialEq, Eq, Clone, Copy, Hash, Debug, Reflect)]
 #[reflect(Hash)]
 pub enum PlayerAction {
+    /// Move player left (A or Left Arrow)
     MoveLeft,
+    /// Move player right (D or Right Arrow)
     MoveRight,
+    /// Jump action (Space)
     Jump,
+    /// Climb ladder (W or Up Arrow)
     Climb,
+    /// Interact with objects (F)
     Interact,
+    /// Toggle candle lit/unlit state (E)
     ToggleCandle,
+    /// Use selected item (U)
     UseItem,
+    /// Open inventory screen (I)
     OpenInventory,
+    /// Open map overlay (Tab)
     OpenMap,
+    /// Pause game (Escape)
     Pause,
 }
 
-/// Plugin to register input actions and provide default input map
+/// Plugin to register input actions and provide default input map.
+///
+/// Adds the input manager plugin and registers the `PlayerAction` type
+/// for reflection and serialization.
 pub struct InputConfigPlugin;
 
 impl Plugin for InputConfigPlugin {
@@ -26,7 +43,23 @@ impl Plugin for InputConfigPlugin {
     }
 }
 
-/// Create default input map with keyboard bindings
+/// Creates the default keyboard input map for player actions.
+///
+/// Returns an `InputMap` with all player actions bound to their
+/// default keyboard keys. Can be customized or replaced for
+/// different control schemes.
+///
+/// # Default Bindings
+///
+/// - Movement: A/D or Arrow Keys
+/// - Jump: Space
+/// - Climb: W or Up Arrow
+/// - Interact: F
+/// - Toggle Candle: E
+/// - Use Item: U
+/// - Inventory: I
+/// - Map: Tab
+/// - Pause: Escape
 pub fn default_input_map() -> InputMap<PlayerAction> {
     let mut input_map = InputMap::default();
 

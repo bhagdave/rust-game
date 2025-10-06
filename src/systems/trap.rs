@@ -8,10 +8,6 @@ use bevy::prelude::*;
 /// and the player's health to become `Health::Dead`. It also triggers
 /// a `PlayerDeathEvent` for downstream systems to handle.
 ///
-/// # Fields
-/// * `trap` - The entity of the trap being triggered
-/// * `player` - The entity of the player who triggered the trap
-///
 /// # Examples
 /// ```ignore
 /// fn collision_detection_system(
@@ -25,7 +21,9 @@ use bevy::prelude::*;
 /// ```
 #[derive(Event)]
 pub struct TrapTriggeredEvent {
+    /// The entity of the trap being triggered
     pub trap: Entity,
+    /// The entity of the player who triggered the trap
     pub player: Entity,
 }
 
@@ -34,9 +32,6 @@ pub struct TrapTriggeredEvent {
 /// Other systems (respawn, UI, audio) should listen for this event
 /// to react to player death. This event is emitted by the trap activation
 /// system when a player is killed by a trap.
-///
-/// # Fields
-/// * `player` - The entity of the player who died
 ///
 /// # Examples
 /// ```ignore
@@ -50,6 +45,7 @@ pub struct TrapTriggeredEvent {
 /// ```
 #[derive(Event)]
 pub struct PlayerDeathEvent {
+    /// The entity of the player who died
     pub player: Entity,
 }
 

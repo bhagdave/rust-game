@@ -1,27 +1,60 @@
 use bevy::prelude::*;
 
+/// Marker component for candle entities.
+///
+/// Used to identify candle entities in queries. Candles provide light
+/// and consume wax over time when lit.
 #[derive(Component)]
 pub struct Candle;
 
+/// Component storing the remaining wax in a candle.
+///
+/// Value ranges from 0.0 (empty) to 100.0 (full). When wax reaches 0.0,
+/// the candle automatically extinguishes.
 #[derive(Component)]
-pub struct CandleWax(pub f32); // 0.0 to 100.0
+pub struct CandleWax(pub f32);
 
+/// Component tracking the current state of a candle.
+///
+/// State transitions:
+/// - `Unlit` -> `Lit` (when player uses a match)
+/// - `Lit` -> `Extinguished` (when wax reaches 0.0 or environmental effect)
+/// - `Extinguished` -> Cannot be relit
 #[derive(Component, Debug, PartialEq, Clone, Copy)]
 pub enum CandleState {
+    /// Candle has not been lit yet (can be lit with a match)
     Unlit,
+    /// Candle is currently burning and providing light
     Lit,
+    /// Candle wax is depleted or was put out (cannot be relit)
     Extinguished,
 }
 
+/// Component defining how far the player can see around a light source.
+///
+/// Measured in tiles. Typical values:
+/// - 7.0 tiles for a lit candle
+/// - 1.5 tiles for minimal ambient visibility
 #[derive(Component)]
-pub struct VisibilityRadius(pub f32); // in tiles
+pub struct VisibilityRadius(pub f32);
 
+/// Component defining how quickly candle wax depletes.
+///
+/// Measured in wax percentage per second. A burn rate of 1.0 means
+/// the candle will fully deplete in 100 seconds.
 #[derive(Component)]
-pub struct BurnRate(pub f32); // wax per second
+pub struct BurnRate(pub f32);
 
+/// Component defining visual properties of a light source.
+///
+/// Used for rendering light effects. Typical candle values:
+/// - color: Warm yellow-orange (1.0, 0.9, 0.6)
+/// - intensity: 1.0 (full brightness)
 #[derive(Component)]
 pub struct LightSource {
+    /// Color of the emitted light
     pub color: Color,
+    /// Brightness multiplier (0.0 to 1.0+)
     pub intensity: f32,
 }
 

@@ -3,22 +3,41 @@ use bevy::prelude::*;
 use std::collections::HashSet;
 use std::time::Duration;
 
+/// Global game state resource tracking player progress and game status.
+///
+/// This resource maintains the current state of the game including
+/// which room the player is in, completion metrics, and the current
+/// game mode (menu, playing, paused, etc.).
 #[derive(Resource)]
 pub struct GameState {
+    /// ID of the room the player is currently in
     pub current_room: RoomId,
+    /// World position where player should spawn in current room
     pub player_spawn_point: Vec2,
+    /// Total time elapsed since game start
     pub completion_time: Duration,
+    /// Set of secret entities the player has discovered
     pub collected_secrets: HashSet<Entity>,
+    /// Current game mode determining system behavior
     pub game_mode: GameMode,
+    /// Number of times the player has died
     pub deaths: u32,
 }
 
+/// Enum representing the current mode/state of the game.
+///
+/// Different game modes affect which systems run and how input is handled.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum GameMode {
+    /// Main menu screen
     Menu,
+    /// Active gameplay
     Playing,
+    /// Game paused by player
     Paused,
+    /// Player died or failed
     GameOver,
+    /// Player successfully escaped the house
     Victory,
 }
 

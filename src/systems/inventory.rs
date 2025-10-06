@@ -25,7 +25,9 @@ use bevy::prelude::*;
 /// ```
 #[derive(Event)]
 pub struct ItemCollectedEvent {
+    /// Entity ID of the item being collected
     pub item: Entity,
+    /// Entity ID of the player collecting the item
     pub player: Entity,
 }
 
@@ -35,7 +37,9 @@ pub struct ItemCollectedEvent {
 /// (e.g., using a match to light a candle).
 #[derive(Event)]
 pub struct ItemUsedEvent {
+    /// The item being used
     pub item: Item,
+    /// Entity ID of the player using the item
     pub player: Entity,
 }
 
