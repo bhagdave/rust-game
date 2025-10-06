@@ -47,7 +47,10 @@ use bevy::prelude::*;
 ///
 /// The fixed timestep rate is set to 60Hz (16.67ms per tick). To modify:
 ///
-/// ```rust
+/// ```rust,no_run
+/// # use bevy::prelude::*;
+/// # use bevy::time::Fixed;
+/// # let mut app = App::new();
 /// app.insert_resource(Time::<Fixed>::from_hz(120.0)); // 120Hz
 /// ```
 ///
