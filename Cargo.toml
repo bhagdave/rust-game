@@ -30,10 +30,16 @@ serde = { version = "1.0", features = ["derive"] }
 ron = "0.8"
 # Cross-platform directory paths for save files
 directories = "5"
+# Image validation (optional, for dimension tests)
+image = { version = "0.25", optional = true }
 
 [dev-dependencies]
 # Performance benchmarking
 criterion = "0.5"
+
+[features]
+# Optional feature for sprite dimension validation tests
+image-validation = ["image"]
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]

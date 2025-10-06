@@ -33,16 +33,14 @@ use bevy::prelude::*;
 ///
 /// Add this plugin to your Bevy app during initialization:
 ///
-/// ```rust
+/// ```no_run
 /// use bevy::prelude::*;
 /// use rust_game::systems::fixed_timestep::FixedTimestepPlugin;
 ///
-/// fn main() {
-///     App::new()
-///         .add_plugins(DefaultPlugins)
-///         .add_plugins(FixedTimestepPlugin)
-///         .run();
-/// }
+/// App::new()
+///     .add_plugins(DefaultPlugins)
+///     .add_plugins(FixedTimestepPlugin)
+///     .run();
 /// ```
 ///
 /// # Configuration

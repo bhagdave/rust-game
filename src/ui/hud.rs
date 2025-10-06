@@ -159,10 +159,7 @@ mod tests {
         app.add_systems(Update, hud_system);
 
         // System compiles and can be added - verified by compilation
-        assert!(
-            true,
-            "HUD system compiles and can be added to Update schedule"
-        );
+        // (No assertion needed - test passes if code compiles)
     }
 
     #[test]
@@ -174,27 +171,21 @@ mod tests {
         app.add_plugins(HudPlugin);
 
         // Plugin compiles and can be added - verified by compilation
-        assert!(true, "HudPlugin compiles and adds hud_system");
+        // (No assertion needed - test passes if code compiles)
     }
 
     #[test]
     fn hud_system_reads_candle_wax() {
         // Test verifies system can read CandleWax component
         // This is verified by the system signature compilation
-        assert!(
-            true,
-            "hud_system correctly queries CandleWax component with Candle marker"
-        );
+        // (No assertion needed - test passes if code compiles)
     }
 
     #[test]
     fn hud_system_reads_inventory() {
         // Test verifies system can read Inventory component
         // This is verified by the system signature compilation
-        assert!(
-            true,
-            "hud_system correctly queries Inventory component with Player marker"
-        );
+        // (No assertion needed - test passes if code compiles)
     }
 
     #[test]
@@ -268,7 +259,7 @@ mod tests {
         for wax in wax_values {
             let percentage = wax / 100.0;
             assert!(
-                percentage >= 0.0 && percentage <= 1.0,
+                (0.0..=1.0).contains(&percentage),
                 "Wax percentage should be between 0.0 and 1.0"
             );
         }

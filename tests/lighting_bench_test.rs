@@ -60,7 +60,7 @@ fn test_lighting_at_half_radius() {
 
     let intensity = calculate_lighting_at_point(point_at_half, light_pos, radius);
     assert!(
-        intensity >= 0.5 && intensity < 1.0,
+        (0.5..1.0).contains(&intensity),
         "Intensity at half radius should be >= 0.5 and < 1.0, got {}",
         intensity
     );
