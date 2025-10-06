@@ -1,5 +1,6 @@
 pub mod candle_burn;
 pub mod collision;
+pub mod fixed_timestep;
 pub mod inventory;
 pub mod level_loader;
 pub mod lighting;
