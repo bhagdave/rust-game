@@ -16,7 +16,7 @@ pub enum Item {
     DiaryPage(usize),
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 pub enum KeyType {
     Brass,
     Iron,

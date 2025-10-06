@@ -1,6 +1,7 @@
 pub mod candle_burn;
 pub mod collision;
 pub mod inventory;
+pub mod level_loader;
 pub mod lighting;
 pub mod player_movement;
 pub mod puzzle;

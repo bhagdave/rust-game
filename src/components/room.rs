@@ -10,7 +10,7 @@ pub struct Room {
     pub name: String,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum Floor {
     Ground,
     First,
@@ -35,7 +35,7 @@ pub struct RoomConnection {
     pub locked: Option<KeyType>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum ConnectionType {
     Door,
     Staircase,
