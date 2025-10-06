@@ -4,7 +4,42 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bevy = "0.16.1"
+# Bevy game engine with bevy_audio disabled (incompatible with bevy_kira_audio)
+bevy = { version = "0.16.1", default-features = false, features = [
+    "bevy_asset",
+    "bevy_sprite",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_winit",
+    "bevy_render",
+    "bevy_core_pipeline",
+    "png",
+    "x11",
+] }
+# Tilemap rendering for 2D rooms
+bevy_ecs_tilemap = "0.16.0"
+# Audio engine (requires bevy_audio to be disabled)
+bevy_kira_audio = "0.23.0"
+# Immediate mode GUI for HUD
+bevy_egui = "0.36.0"
+# Input management with configurable controls
+leafwing-input-manager = "0.17.0"
+# Serialization for save/load and level data
+serde = { version = "1.0", features = ["derive"] }
+# RON format for save files and level data
+ron = "0.8"
+# Cross-platform directory paths for save files
+directories = "5"
+# Image validation (optional, for dimension tests)
+image = { version = "0.25", optional = true }
+
+[dev-dependencies]
+# Performance benchmarking
+criterion = "0.5"
+
+[features]
+# Optional feature for sprite dimension validation tests
+image-validation = ["image"]
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]
@@ -13,4 +48,9 @@ opt-level = 1
 # Enable a large amount of optimization in the dev profile for dependencies.
 [profile.dev.package."*"]
 opt-level = 3
+
+# Benchmark configuration
+[[bench]]
+name = "lighting_bench"
+harness = false
 

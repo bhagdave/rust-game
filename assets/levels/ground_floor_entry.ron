@@ -1,0 +1,99 @@
+// Ground Floor Entry Hall - First playable room
+// From tasks.md T038: Example room level data in RON format
+//
+// This room serves as the starting point for the house escape game.
+// Players spawn here and must collect matches to light their candle,
+// find the brass key to unlock the door to the hallway.
+//
+// Room Layout:
+// - 20x15 tile grid (1920x1080 pixels, 32px per tile)
+// - Walls around perimeter (tile index 1)
+// - Floor tiles in center (tile index 0)
+// - Door on east wall leading to hallway (room 1)
+//
+// Entities:
+// - 3 matches scattered around the room for candle lighting
+// - 1 brass key hidden in the corner
+// - 1 door (locked with brass key) leading to next room
+// - 1 candle (player's light source)
+//
+// Connections:
+// - East door to Hallway (room 1), locked with Brass key
+
+(
+    id: 0,
+    floor: Ground,
+    name: "Entry Hall",
+    bounds: (
+        min: (0.0, 0.0),
+        max: (1920.0, 1080.0),
+    ),
+    tiles: [
+        // 20x15 tile grid - 1 = wall, 0 = floor
+        // Top wall
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        // Interior rows with side walls
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        // Bottom wall
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ],
+    entities: [
+        // Player spawn point (implicit - center of room)
+        (
+            entity_type: "PlayerSpawn",
+            position: (960.0, 540.0),
+        ),
+        // Candle - player's light source
+        (
+            entity_type: "Candle",
+            position: (960.0, 540.0),
+        ),
+        // Matches for lighting the candle
+        (
+            entity_type: "Match",
+            position: (300.0, 200.0),
+        ),
+        (
+            entity_type: "Match",
+            position: (1600.0, 200.0),
+        ),
+        (
+            entity_type: "Match",
+            position: (960.0, 800.0),
+        ),
+        // Brass key to unlock the door
+        (
+            entity_type: "Key",
+            position: (200.0, 900.0),
+            key_type: Some(Brass),
+        ),
+        // Door to hallway (locked)
+        (
+            entity_type: "Door",
+            position: (1840.0, 540.0),
+            target_room: Some(1),
+            locked: Some(Brass),
+        ),
+    ],
+    connections: [
+        // East door to hallway
+        (
+            target_room: 1,
+            connection_type: Door,
+            position: (1840.0, 540.0),
+            locked: Some(Brass),
+        ),
+    ],
+)
