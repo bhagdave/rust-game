@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, 001-house-escape-game ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
