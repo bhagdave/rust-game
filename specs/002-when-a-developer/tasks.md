@@ -108,13 +108,13 @@
 
 ### 3.4.3: Interactive Object Spawning
 
-- [ ] **T015** Implement `spawn_door()` helper function in `src/systems/demo_level.rs`:
+- [X] **T015** Implement `spawn_door()` helper function in `src/systems/demo_level.rs`:
   - Parameters: `commands: &mut Commands`, `entity_spawn: &EntitySpawn`, `asset_handles: &AssetHandles`
   - Spawn entity at position from entity_spawn
-  - Add `InteractableDemo` component with object_id and prompt "Press E to open"
+  - Add `InteractableDemo` component with object_id and prompt based on door state
   - Add `DemoMarker` component
-  - Add `SpriteBundle` with door sprite from AssetHandles
-  - Handle locked doors if entity_spawn has locked field
+  - Add `Sprite` component with door sprite from AssetHandles
+  - Handle locked doors with DoorState component (Locked/Unlocked)
   - Add rustdoc and return spawned entity ID
 
 - [ ] **T016** Implement `spawn_item()` helper function in `src/systems/demo_level.rs`:
