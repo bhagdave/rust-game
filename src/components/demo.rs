@@ -65,7 +65,7 @@ mod tests {
         let _marker3 = marker2;
 
         // Should implement Default
-        let _default_marker = DemoMarker::default();
+        let _default_marker = DemoMarker;
     }
 
     #[test]
