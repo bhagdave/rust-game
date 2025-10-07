@@ -70,7 +70,7 @@
   - Use Bevy's `FrameTimeDiagnosticsPlugin` for FPS measurement
   - **Expected**: Tests FAIL or cannot run (no demo implementation)
 
-- [ ] **T010** [P] Create integration test `tests/demo_interaction.rs`:
+- [X] **T010** [P] Create integration test `tests/demo_interaction.rs`:
   - Test: player can move with keyboard input (WASD/arrows)
   - Test: interaction prompt appears when near interactive object
   - Test: interaction executes on key press (E key)
