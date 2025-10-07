@@ -98,11 +98,11 @@
 
 ### 3.4.2: Player Spawning
 
-- [ ] **T014** Implement `spawn_player()` helper function in `src/systems/demo_level.rs`:
+- [X] **T014** Implement `spawn_player()` helper function in `src/systems/demo_level.rs`:
   - Parameters: `commands: &mut Commands`, `position: Vec2`, `asset_handles: &AssetHandles`
   - Spawn entity with `Player`, `Velocity`, `JumpState`, `Health` components
   - Add `DemoMarker` component
-  - Add `SpriteBundle` with player sprite from AssetHandles
+  - Add `Sprite` component with player sprite from AssetHandles
   - Add rustdoc with parameter descriptions and usage example
   - Return spawned entity ID
 
