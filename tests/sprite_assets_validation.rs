@@ -108,9 +108,9 @@ mod dimension_tests {
     fn tileset_sprite_has_correct_dimensions() {
         let img = image::open("assets/sprites/tileset.png").expect("Should open tileset sprite");
         let (width, height) = img.dimensions();
-        // Tileset is 32x16 (2 tiles of 16x16 each, arranged horizontally)
-        assert_eq!(width, 32, "Tileset should be 32 pixels wide");
-        assert_eq!(height, 16, "Tileset should be 16 pixels tall");
+        // Tileset is 64x32 (2 tiles of 32x32 each, arranged horizontally)
+        assert_eq!(width, 64, "Tileset should be 64 pixels wide");
+        assert_eq!(height, 32, "Tileset should be 32 pixels tall");
     }
 
     #[test]

@@ -34,9 +34,9 @@
 ## Phase 3.1: Asset Creation & Setup
 **Note**: Asset tasks can run in parallel - different files, no code dependencies
 
-- [ ] **T001** [P] Create placeholder sprite at `assets/sprites/demo_placeholder.png` (32x32 magenta #FF00FF PNG for missing asset visibility)
-- [ ] **T002** [P] Create demo level RON file at `assets/levels/demo.ron` following existing `LevelData` format from `ground_floor_entry.ron` (include tiles array, player spawn, interactive objects: 2-3 doors, 2-3 items)
-- [ ] **T003** [P] Verify demo tileset exists at `assets/sprites/tileset.png` or create simple 2-tile version (floor + wall, 32x32 each)
+- [X] **T001** [P] Create placeholder sprite at `assets/sprites/demo_placeholder.png` (32x32 magenta #FF00FF PNG for missing asset visibility)
+- [X] **T002** [P] Create demo level RON file at `assets/levels/demo.ron` following existing `LevelData` format from `ground_floor_entry.ron` (include tiles array, player spawn, interactive objects: 2-3 doors, 2-3 items)
+- [X] **T003** [P] Verify demo tileset exists at `assets/sprites/tileset.png` or create simple 2-tile version (floor + wall, 32x32 each)
 
 ## Phase 3.2: Data Structure Extensions
 **Note**: These extend existing files - must be done sequentially per file
