@@ -117,12 +117,12 @@
   - Handle locked doors with DoorState component (Locked/Unlocked)
   - Add rustdoc and return spawned entity ID
 
-- [ ] **T016** Implement `spawn_item()` helper function in `src/systems/demo_level.rs`:
+- [X] **T016** Implement `spawn_item()` helper function in `src/systems/demo_level.rs`:
   - Parameters: `commands: &mut Commands`, `entity_spawn: &EntitySpawn`, `asset_handles: &AssetHandles`
   - Spawn entity at position from entity_spawn
   - Add `InteractableDemo` component with object_id and prompt "Press E to collect"
   - Add `DemoMarker` component
-  - Add `SpriteBundle` with appropriate sprite (Match or Key) from AssetHandles
+  - Add `Sprite` component with appropriate sprite (Match or Key) from AssetHandles
   - Differentiate between Match and Key entity types
   - Add rustdoc and return spawned entity ID
 
