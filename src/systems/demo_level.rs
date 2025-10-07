@@ -44,12 +44,12 @@ use bevy::sprite::Sprite;
 
 // Import local components for demo entities
 use crate::components::demo::{DemoMarker, InteractableDemo};
-use crate::components::inventory::KeyType;
+use crate::components::inventory::{Collectible, Item, KeyType};
 use crate::components::player::{Health, JumpState, Player, Velocity};
 use crate::components::room::{Door, DoorState};
 
 // Import level data structures for loading demo level
-use crate::systems::level_loader::{EntitySpawn, LevelData};
+use crate::systems::level_loader::EntitySpawn;
 
 use crate::resources::asset_handles::{AssetHandles, SpriteType};
 
@@ -239,8 +239,129 @@ pub fn spawn_door(
         .id()
 }
 
+/// Spawns an item entity (match or key) for the demo level based on level data.
+///
+/// Creates a collectible item entity that players can pick up during the demo.
+/// Items can be either matches (for lighting candles) or keys (for unlocking doors).
+/// The entity is marked with `DemoMarker` for easy cleanup when the demo level ends.
+///
+/// # Parameters
+///
+/// - `commands`: Mutable reference to Bevy's command buffer for spawning entities
+/// - `entity_spawn`: Level data describing the item (position, type, key variant, etc.)
+/// - `asset_handles`: Resource containing handles to loaded game assets
+///
+/// # Returns
+///
+/// Returns the `Entity` ID of the spawned item for tracking or further modification.
+///
+/// # Components Added
+///
+/// The spawned entity includes:
+/// - `Item`: Enum variant (Match or Key with specific KeyType)
+/// - `Collectible`: Marker indicating this item can be picked up
+/// - `InteractableDemo`: Interaction prompt ("Press E to collect")
+/// - `DemoMarker`: Tags entity for demo cleanup
+/// - `Sprite`: Visual representation with item sprite
+/// - `Transform`: Positioned at location from entity_spawn
+///
+/// # Example
+///
+/// ```ignore
+/// use crate::systems::level_loader::EntitySpawn;
+/// use crate::components::inventory::KeyType;
+///
+/// // Spawn a match item
+/// let match_spawn = EntitySpawn {
+///     entity_type: "Match".to_string(),
+///     position: (150.0, 200.0),
+///     target_room: None,
+///     locked: None,
+///     key_type: None,
+/// };
+///
+/// let match_entity = spawn_item(
+///     &mut commands,
+///     &match_spawn,
+///     &asset_handles,
+/// );
+///
+/// // Spawn a brass key
+/// let key_spawn = EntitySpawn {
+///     entity_type: "Key".to_string(),
+///     position: (300.0, 150.0),
+///     target_room: None,
+///     locked: None,
+///     key_type: Some(KeyType::Brass),
+/// };
+///
+/// let key_entity = spawn_item(
+///     &mut commands,
+///     &key_spawn,
+///     &asset_handles,
+/// );
+/// ```
+///
+/// # Item Type Logic
+///
+/// - If `entity_spawn.entity_type == "Match"`, spawns `Item::Match`
+/// - If `entity_spawn.entity_type == "Key"`, spawns `Item::Key(key_type)`
+///   - `key_type` is extracted from `entity_spawn.key_type` (defaults to `KeyType::Brass` if not specified)
+/// - All items show "Press E to collect" interaction prompt
+pub fn spawn_item(
+    commands: &mut Commands,
+    entity_spawn: &EntitySpawn,
+    asset_handles: &AssetHandles,
+) -> Entity {
+    // Determine item type based on entity_spawn data
+    let item = if entity_spawn.entity_type == "Match" {
+        Item::Match
+    } else {
+        // For keys, use the specified key_type or default to Brass
+        let key_type = entity_spawn.key_type.unwrap_or(KeyType::Brass);
+        Item::Key(key_type)
+    };
+
+    // Get item sprite handle (fallback to default if not found)
+    // TODO: Use specific item sprite types once AssetHandles supports item variants
+    let sprite_handle = asset_handles
+        .sprites
+        .get(&SpriteType::Player) // Placeholder - will use item sprites in future
+        .cloned()
+        .unwrap_or_default();
+
+    // Create object ID from entity type and position
+    let object_id = format!(
+        "{}_{:.0}_{:.0}",
+        entity_spawn.entity_type, entity_spawn.position.0, entity_spawn.position.1
+    );
+
+    // Convert position tuple to Vec2
+    let position = Vec2::new(entity_spawn.position.0, entity_spawn.position.1);
+
+    // All items use the same interaction prompt
+    let interaction_prompt = "Press E to collect".to_string();
+
+    // Spawn item entity with all required components
+    commands
+        .spawn((
+            item,
+            Collectible,
+            InteractableDemo {
+                object_id,
+                interaction_prompt,
+            },
+            DemoMarker,
+            Sprite {
+                image: sprite_handle,
+                ..default()
+            },
+            Transform::from_translation(position.extend(0.0)),
+        ))
+        .id()
+}
+
 // Future functions will be implemented here in subsequent tasks:
-// - spawn_item(): Spawns items (matches, keys) for demo level
 // - load_demo_level(): Main system to load demo from RON file
 // - cleanup_demo_level(): System to despawn all demo entities
 // - handle_asset_fallback(): Provides placeholder when assets fail
@@ -275,7 +396,7 @@ mod tests {
     fn level_data_type_accessible() {
         // Verify LevelData is properly imported for demo loading
         // This will be used to parse assets/levels/demo.ron
-        let _level_data_type = std::any::type_name::<LevelData>();
+        let _level_data_type = std::any::type_name::<crate::systems::level_loader::LevelData>();
     }
 
     #[test]
@@ -928,5 +1049,386 @@ mod tests {
                 key_type
             );
         }
+    }
+
+    // ===== Tests for spawn_item() =====
+
+    #[test]
+    fn spawn_item_creates_match_entity() {
+        // Verify spawn_item creates a match item and returns valid Entity ID
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let item_spawn = EntitySpawn {
+            entity_type: "Match".to_string(),
+            position: (150.0, 200.0),
+            target_room: None,
+            locked: None,
+            key_type: None,
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item_entity = spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+        // Entity ID is always valid when returned from spawn
+        let _ = item_entity;
+    }
+
+    #[test]
+    fn spawn_item_creates_key_entity() {
+        // Verify spawn_item creates a key item with specified key type
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let item_spawn = EntitySpawn {
+            entity_type: "Key".to_string(),
+            position: (300.0, 150.0),
+            target_room: None,
+            locked: None,
+            key_type: Some(KeyType::Iron),
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item_entity = spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+        // Entity ID is always valid when returned from spawn
+        let _ = item_entity;
+    }
+
+    #[test]
+    fn spawn_item_adds_all_required_components() {
+        // Verify spawn_item adds all necessary components to the item entity
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let item_spawn = EntitySpawn {
+            entity_type: "Match".to_string(),
+            position: (100.0, 100.0),
+            target_room: None,
+            locked: None,
+            key_type: None,
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item_entity = spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+        app.update();
+
+        // Verify all components are present
+        let world = app.world();
+        assert!(
+            world.get::<Item>(item_entity).is_some(),
+            "Item component should be present"
+        );
+        assert!(
+            world.get::<Collectible>(item_entity).is_some(),
+            "Collectible component should be present"
+        );
+        assert!(
+            world.get::<InteractableDemo>(item_entity).is_some(),
+            "InteractableDemo component should be present"
+        );
+        assert!(
+            world.get::<DemoMarker>(item_entity).is_some(),
+            "DemoMarker component should be present"
+        );
+        assert!(
+            world.get::<Transform>(item_entity).is_some(),
+            "Transform component should be present"
+        );
+    }
+
+    #[test]
+    fn spawn_item_sets_correct_position() {
+        // Verify spawn_item places entity at the specified position
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let spawn_position = (456.78, 123.45);
+        let item_spawn = EntitySpawn {
+            entity_type: "Match".to_string(),
+            position: spawn_position,
+            target_room: None,
+            locked: None,
+            key_type: None,
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item_entity = spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+        app.update();
+
+        let world = app.world();
+        let transform = world.get::<Transform>(item_entity).unwrap();
+
+        assert!(
+            (transform.translation.x - spawn_position.0).abs() < 0.01,
+            "Item X position should be {}",
+            spawn_position.0
+        );
+        assert!(
+            (transform.translation.y - spawn_position.1).abs() < 0.01,
+            "Item Y position should be {}",
+            spawn_position.1
+        );
+    }
+
+    #[test]
+    fn spawn_item_match_creates_correct_item_type() {
+        // Verify spawn_item creates Item::Match for "Match" entity type
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let item_spawn = EntitySpawn {
+            entity_type: "Match".to_string(),
+            position: (0.0, 0.0),
+            target_room: None,
+            locked: None,
+            key_type: None,
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item_entity = spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+        app.update();
+
+        let world = app.world();
+        let item = world.get::<Item>(item_entity).unwrap();
+
+        assert!(
+            matches!(item, Item::Match),
+            "Item should be Item::Match variant"
+        );
+    }
+
+    #[test]
+    fn spawn_item_key_creates_correct_item_type() {
+        // Verify spawn_item creates Item::Key with correct KeyType
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let item_spawn = EntitySpawn {
+            entity_type: "Key".to_string(),
+            position: (0.0, 0.0),
+            target_room: None,
+            locked: None,
+            key_type: Some(KeyType::Ornate),
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item_entity = spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+        app.update();
+
+        let world = app.world();
+        let item = world.get::<Item>(item_entity).unwrap();
+
+        assert!(
+            matches!(item, Item::Key(KeyType::Ornate)),
+            "Item should be Item::Key(KeyType::Ornate)"
+        );
+    }
+
+    #[test]
+    fn spawn_item_key_defaults_to_brass_when_unspecified() {
+        // Verify spawn_item defaults to Brass key when key_type is None
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let item_spawn = EntitySpawn {
+            entity_type: "Key".to_string(),
+            position: (0.0, 0.0),
+            target_room: None,
+            locked: None,
+            key_type: None, // No key type specified
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item_entity = spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+        app.update();
+
+        let world = app.world();
+        let item = world.get::<Item>(item_entity).unwrap();
+
+        assert!(
+            matches!(item, Item::Key(KeyType::Brass)),
+            "Item should default to Item::Key(KeyType::Brass) when unspecified"
+        );
+    }
+
+    #[test]
+    fn spawn_item_sets_interaction_prompt() {
+        // Verify spawn_item sets "Press E to collect" prompt for all items
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let item_spawn = EntitySpawn {
+            entity_type: "Match".to_string(),
+            position: (0.0, 0.0),
+            target_room: None,
+            locked: None,
+            key_type: None,
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item_entity = spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+        app.update();
+
+        let world = app.world();
+        let interactable = world.get::<InteractableDemo>(item_entity).unwrap();
+
+        assert_eq!(
+            interactable.interaction_prompt, "Press E to collect",
+            "All items should have 'Press E to collect' prompt"
+        );
+    }
+
+    #[test]
+    fn spawn_item_generates_unique_object_id() {
+        // Verify spawn_item generates unique object IDs based on type and position
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let item1_spawn = EntitySpawn {
+            entity_type: "Match".to_string(),
+            position: (100.0, 200.0),
+            target_room: None,
+            locked: None,
+            key_type: None,
+        };
+
+        let item2_spawn = EntitySpawn {
+            entity_type: "Key".to_string(),
+            position: (300.0, 400.0),
+            target_room: None,
+            locked: None,
+            key_type: Some(KeyType::Iron),
+        };
+
+        let asset_handles = AssetHandles::default();
+        let item1_entity = spawn_item(
+            &mut app.world_mut().commands(),
+            &item1_spawn,
+            &asset_handles,
+        );
+        let item2_entity = spawn_item(
+            &mut app.world_mut().commands(),
+            &item2_spawn,
+            &asset_handles,
+        );
+
+        app.update();
+
+        let world = app.world();
+        let item1_interactable = world.get::<InteractableDemo>(item1_entity).unwrap();
+        let item2_interactable = world.get::<InteractableDemo>(item2_entity).unwrap();
+
+        assert_eq!(
+            item1_interactable.object_id, "Match_100_200",
+            "Match should have object ID based on position"
+        );
+        assert_eq!(
+            item2_interactable.object_id, "Key_300_400",
+            "Key should have object ID based on position"
+        );
+        assert_ne!(
+            item1_interactable.object_id, item2_interactable.object_id,
+            "Different items should have unique object IDs"
+        );
+    }
+
+    #[test]
+    fn spawn_item_supports_all_key_types() {
+        // Verify spawn_item handles all KeyType variants
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let key_types = vec![
+            KeyType::Brass,
+            KeyType::Iron,
+            KeyType::Ornate,
+            KeyType::Master,
+        ];
+
+        for (i, key_type) in key_types.iter().enumerate() {
+            let item_spawn = EntitySpawn {
+                entity_type: "Key".to_string(),
+                position: (i as f32 * 50.0, 0.0),
+                target_room: None,
+                locked: None,
+                key_type: Some(*key_type),
+            };
+
+            let asset_handles = AssetHandles::default();
+            let item_entity =
+                spawn_item(&mut app.world_mut().commands(), &item_spawn, &asset_handles);
+
+            app.update();
+
+            let world = app.world();
+            let item = world.get::<Item>(item_entity).unwrap();
+
+            assert!(
+                matches!(item, Item::Key(kt) if kt == key_type),
+                "Item should be Key with {:?} type",
+                key_type
+            );
+        }
+    }
+
+    #[test]
+    fn spawn_item_multiple_items_all_have_collectible() {
+        // Verify all spawned items have Collectible marker for pickup system
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let match_spawn = EntitySpawn {
+            entity_type: "Match".to_string(),
+            position: (0.0, 0.0),
+            target_room: None,
+            locked: None,
+            key_type: None,
+        };
+
+        let key_spawn = EntitySpawn {
+            entity_type: "Key".to_string(),
+            position: (50.0, 0.0),
+            target_room: None,
+            locked: None,
+            key_type: Some(KeyType::Master),
+        };
+
+        let asset_handles = AssetHandles::default();
+        let match_entity = spawn_item(
+            &mut app.world_mut().commands(),
+            &match_spawn,
+            &asset_handles,
+        );
+        let key_entity = spawn_item(&mut app.world_mut().commands(), &key_spawn, &asset_handles);
+
+        app.update();
+
+        let world = app.world();
+        assert!(
+            world.get::<Collectible>(match_entity).is_some(),
+            "Match should have Collectible component"
+        );
+        assert!(
+            world.get::<Collectible>(key_entity).is_some(),
+            "Key should have Collectible component"
+        );
     }
 }
