@@ -128,7 +128,7 @@
 
 ### 3.4.4: Entity Spawning Orchestration
 
-- [ ] **T017** Implement `spawn_demo_entities()` orchestrator function in `src/systems/demo_level.rs`:
+- [X] **T017** Implement `spawn_demo_entities()` orchestrator function in `src/systems/demo_level.rs`:
   - Parameters: `level_data: &LevelData`, `commands: &mut Commands`, `asset_handles: &AssetHandles`
   - Iterate through `level_data.entities`
   - Match on `entity_spawn.entity_type`: "PlayerSpawn", "Door", "Match", "Key"

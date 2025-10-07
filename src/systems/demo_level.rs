@@ -361,6 +361,127 @@ pub fn spawn_item(
         .id()
 }
 
+/// Spawns all entities from demo level data based on their types.
+///
+/// This orchestrator function processes the `entities` array from `LevelData` and
+/// delegates spawning to specialized helper functions based on entity type. It handles
+/// player spawns, doors, and collectible items (matches and keys).
+///
+/// # Parameters
+///
+/// - `level_data`: Reference to the loaded level data containing entity definitions
+/// - `commands`: Mutable reference to Bevy's command buffer for spawning entities
+/// - `asset_handles`: Resource containing handles to loaded game assets
+///
+/// # Returns
+///
+/// Returns the total count of successfully spawned entities.
+///
+/// # Entity Type Mapping
+///
+/// - `"PlayerSpawn"` → Calls `spawn_player()` at entity position
+/// - `"Door"` → Calls `spawn_door()` with door configuration
+/// - `"Match"` → Calls `spawn_item()` as collectible match
+/// - `"Key"` → Calls `spawn_item()` as collectible key with specific KeyType
+/// - Unknown types → Logs warning and skips entity
+///
+/// # Example
+///
+/// ```ignore
+/// use crate::systems::level_loader::load_level_data;
+///
+/// fn load_demo_level(
+///     mut commands: Commands,
+///     asset_handles: Res<AssetHandles>,
+/// ) {
+///     // Load demo level from RON file
+///     let level_data = load_level_data("levels/demo.ron")
+///         .expect("Failed to load demo level");
+///
+///     // Spawn all entities defined in the level
+///     let entity_count = spawn_demo_entities(
+///         &level_data,
+///         &mut commands,
+///         &asset_handles,
+///     );
+///
+///     info!("Spawned {} demo entities", entity_count);
+/// }
+/// ```
+///
+/// # Error Handling
+///
+/// - Logs warnings for unknown entity types but continues processing
+/// - Does not panic on invalid data - returns count of successful spawns
+/// - Each spawn helper handles its own validation and fallback logic
+///
+/// # Contract Requirements
+///
+/// Per contracts/demo_level_interface.md:
+/// - Must process all entities from level_data.entities array
+/// - Must delegate to appropriate spawn helper functions
+/// - Must track and return total entity count
+/// - Must log warnings for unrecognized entity types
+pub fn spawn_demo_entities(
+    level_data: &crate::systems::level_loader::LevelData,
+    commands: &mut Commands,
+    asset_handles: &AssetHandles,
+) -> usize {
+    let mut spawned_count = 0;
+
+    // Iterate through all entities defined in the level data
+    for entity_spawn in &level_data.entities {
+        match entity_spawn.entity_type.as_str() {
+            "PlayerSpawn" => {
+                // Spawn player at specified position
+                let position = Vec2::new(entity_spawn.position.0, entity_spawn.position.1);
+                spawn_player(commands, position, asset_handles);
+                spawned_count += 1;
+                info!(
+                    "Spawned player at position ({:.0}, {:.0})",
+                    position.x, position.y
+                );
+            }
+            "Door" => {
+                // Spawn door with configuration from entity_spawn
+                spawn_door(commands, entity_spawn, asset_handles);
+                spawned_count += 1;
+                info!(
+                    "Spawned door at position ({:.0}, {:.0})",
+                    entity_spawn.position.0, entity_spawn.position.1
+                );
+            }
+            "Match" => {
+                // Spawn collectible match item
+                spawn_item(commands, entity_spawn, asset_handles);
+                spawned_count += 1;
+                info!(
+                    "Spawned match at position ({:.0}, {:.0})",
+                    entity_spawn.position.0, entity_spawn.position.1
+                );
+            }
+            "Key" => {
+                // Spawn collectible key item
+                spawn_item(commands, entity_spawn, asset_handles);
+                spawned_count += 1;
+                info!(
+                    "Spawned key at position ({:.0}, {:.0})",
+                    entity_spawn.position.0, entity_spawn.position.1
+                );
+            }
+            unknown => {
+                // Log warning for unrecognized entity types
+                warn!(
+                    "Unknown entity type '{}' at position ({:.0}, {:.0}) - skipping",
+                    unknown, entity_spawn.position.0, entity_spawn.position.1
+                );
+            }
+        }
+    }
+
+    spawned_count
+}
+
 // Future functions will be implemented here in subsequent tasks:
 // - load_demo_level(): Main system to load demo from RON file
 // - cleanup_demo_level(): System to despawn all demo entities
