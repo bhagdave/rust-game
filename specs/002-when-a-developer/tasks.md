@@ -42,8 +42,8 @@
 **Note**: These extend existing files - must be done sequentially per file
 
 - [X] **T004** Extend `SpriteType` enum in `src/resources/asset_handles.rs` to add `DemoPlaceholder` variant for fallback graphics
-- [ ] **T005** Create `DemoMarker` component in new file `src/components/demo.rs` as marker for demo-spawned entities (simple unit struct with `#[derive(Component)]`)
-- [ ] **T006** Add `pub mod demo;` to `src/components/mod.rs` to expose DemoMarker component
+- [X] **T005** Create `DemoMarker` component in new file `src/components/demo.rs` as marker for demo-spawned entities (simple unit struct with `#[derive(Component)]`)
+- [X] **T006** Add `pub mod demo;` to `src/components/mod.rs` to expose DemoMarker component
 
 ## Phase 3.3: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.4
 **CRITICAL**: These tests MUST be written and MUST FAIL before ANY implementation

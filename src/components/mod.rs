@@ -3,6 +3,9 @@
 //! This module contains all the components used to define entity behavior
 //! in the house escape game. Components are organized by functionality.
 
+/// Demo level components for testing and validation
+pub mod demo;
+
 /// Inventory management components for items and player storage
 pub mod inventory;
 
