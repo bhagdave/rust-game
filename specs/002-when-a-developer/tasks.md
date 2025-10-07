@@ -63,7 +63,7 @@
   - Test: warning logged to console about missing asset
   - **Expected**: All tests FAIL (no fallback system yet)
 
-- [ ] **T009** [P] Create performance test `tests/demo_performance.rs`:
+- [X] **T009** [P] Create performance test `tests/demo_performance.rs`:
   - Test: demo maintains minimum 30 FPS over 100 frames
   - Test: demo loads within 10 seconds (measure with `Instant::now()`)
   - Test: input lag <50ms (measure timestamp delta from input to player movement)
