@@ -56,7 +56,7 @@
   - Test: DemoMarker component attached to all demo entities
   - **Expected**: All tests FAIL (no implementation yet)
 
-- [ ] **T008** [P] Create contract test `tests/demo_asset_fallback.rs`:
+- [X] **T008** [P] Create contract test `tests/demo_asset_fallback.rs`:
   - Test: when sprite asset fails to load, placeholder handle is used
   - Test: placeholder sprite (magenta) is visibly rendered
   - Test: game continues running without crash when assets missing
