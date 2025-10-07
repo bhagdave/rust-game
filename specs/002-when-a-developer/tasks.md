@@ -77,7 +77,7 @@
   - Test: verify interaction completes within 50ms
   - **Expected**: Tests FAIL (no interaction system for demo)
 
-- [ ] **T011** Verify all tests are deterministic and complete under 30 seconds total (run `cargo test --lib` and check timing)
+- [X] **T011** Verify all tests are deterministic and complete under 30 seconds total (run `cargo test --lib` and check timing)
 
 ## Phase 3.4: Core Implementation (ONLY after tests are failing)
 **Critical Finding from research.md**: Entity spawning NOT implemented in existing codebase - must build from scratch
