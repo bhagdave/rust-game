@@ -161,7 +161,10 @@ mod tests {
         };
 
         // Spawn entity with both components
-        let entity = app.world_mut().spawn((DemoMarker, interactable.clone())).id();
+        let entity = app
+            .world_mut()
+            .spawn((DemoMarker, interactable.clone()))
+            .id();
 
         // Verify entity has both components
         assert!(app.world().get::<DemoMarker>(entity).is_some());
@@ -169,7 +172,8 @@ mod tests {
 
         // Count entities with both components using world_mut
         let world = app.world_mut();
-        let mut query = world.query_filtered::<Entity, (With<DemoMarker>, With<InteractableDemo>)>();
+        let mut query =
+            world.query_filtered::<Entity, (With<DemoMarker>, With<InteractableDemo>)>();
         let count = query.iter(world).count();
 
         assert_eq!(
