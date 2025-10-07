@@ -49,7 +49,7 @@
 **CRITICAL**: These tests MUST be written and MUST FAIL before ANY implementation
 **Constitutional Requirement**: Testing Discipline (Principle II) - 80% coverage, deterministic, <30s execution
 
-- [ ] **T007** [P] Create contract test `tests/demo_level_loading.rs`:
+- [X] **T007** [P] Create contract test `tests/demo_level_loading.rs`:
   - Test: demo level loads from `assets/levels/demo.ron` within 10 seconds
   - Test: demo level spawns player at correct position from level data
   - Test: all entities from level data are spawned with correct components
