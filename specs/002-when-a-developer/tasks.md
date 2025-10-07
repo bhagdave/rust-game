@@ -84,16 +84,17 @@
 
 ### 3.4.1: Entity Spawning Infrastructure
 
-- [ ] **T012** Create base file `src/systems/demo_level.rs` with module structure:
+- [X] **T012** Create base file `src/systems/demo_level.rs` with module structure:
   - Add file header and module-level rustdoc
   - Import required Bevy types and local components
   - Create placeholder for future functions
   - No implementation yet - just structure
 
-- [ ] **T013** Extend `src/components/demo.rs` to add `InteractableDemo` component:
+- [X] **T013** Extend `src/components/demo.rs` to add `InteractableDemo` component:
   - Fields: `object_id: String`, `interaction_prompt: String`
   - Derive: `Component`, `Debug`, `Clone`
   - Add rustdoc explaining usage for demo interactive objects
+  - Note: Already completed in T005-T006
 
 ### 3.4.2: Player Spawning
 

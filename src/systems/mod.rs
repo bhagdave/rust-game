@@ -9,6 +9,9 @@ pub mod candle_burn;
 /// Collision detection and physics system
 pub mod collision;
 
+/// Demo level loading and management system
+pub mod demo_level;
+
 /// Fixed timestep scheduling for deterministic physics
 pub mod fixed_timestep;
 
