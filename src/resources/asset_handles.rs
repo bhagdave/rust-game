@@ -34,6 +34,8 @@ pub enum SpriteType {
     Key(KeyType),
     /// Trap sprite (variant for each trap type)
     Trap(TrapType),
+    /// Demo placeholder sprite for fallback graphics when assets fail to load
+    DemoPlaceholder,
 }
 
 /// Enum identifying different trap sprite variants.
@@ -301,5 +303,38 @@ mod tests {
         assert_eq!(set.len(), 2);
         assert!(set.contains(&SpriteType::Player));
         assert!(set.contains(&SpriteType::Candle));
+    }
+
+    #[test]
+    fn demo_placeholder_sprite_type() {
+        // Test that DemoPlaceholder variant exists and works correctly
+        let placeholder = SpriteType::DemoPlaceholder;
+        let another_placeholder = SpriteType::DemoPlaceholder;
+
+        // Test equality
+        assert_eq!(placeholder, another_placeholder);
+
+        // Test it's different from other sprite types
+        assert_ne!(placeholder, SpriteType::Player);
+        assert_ne!(placeholder, SpriteType::Candle);
+        assert_ne!(placeholder, SpriteType::Match);
+
+        // Test it can be used as a HashMap key
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let placeholder_handle: Handle<Image> = Handle::default();
+
+        {
+            let mut handles = app.world_mut().resource_mut::<AssetHandles>();
+            handles
+                .sprites
+                .insert(SpriteType::DemoPlaceholder, placeholder_handle.clone());
+        }
+
+        let handles = app.world().resource::<AssetHandles>();
+        assert_eq!(handles.sprites.len(), 1);
+        assert!(handles.sprites.contains_key(&SpriteType::DemoPlaceholder));
     }
 }

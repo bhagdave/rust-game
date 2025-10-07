@@ -41,7 +41,7 @@
 ## Phase 3.2: Data Structure Extensions
 **Note**: These extend existing files - must be done sequentially per file
 
-- [ ] **T004** Extend `SpriteType` enum in `src/resources/asset_handles.rs` to add `DemoPlaceholder` variant for fallback graphics
+- [X] **T004** Extend `SpriteType` enum in `src/resources/asset_handles.rs` to add `DemoPlaceholder` variant for fallback graphics
 - [ ] **T005** Create `DemoMarker` component in new file `src/components/demo.rs` as marker for demo-spawned entities (simple unit struct with `#[derive(Component)]`)
 - [ ] **T006** Add `pub mod demo;` to `src/components/mod.rs` to expose DemoMarker component
 
