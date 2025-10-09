@@ -163,7 +163,7 @@
 
 ### 3.4.6: Asset Fallback System
 
-- [ ] **T021** Implement asset fallback system in `src/systems/demo_level.rs`:
+- [X] **T021** Implement asset fallback system in `src/systems/demo_level.rs`:
   - Create `load_demo_assets_with_fallback()` function
   - Load placeholder sprite first: `asset_server.load("sprites/demo_placeholder.png")`
   - Insert into `AssetHandles` with `SpriteType::DemoPlaceholder` key

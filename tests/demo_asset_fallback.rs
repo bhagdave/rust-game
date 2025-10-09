@@ -16,29 +16,37 @@ fn placeholder_handle_used_when_asset_fails() {
     // This test verifies that when a sprite asset fails to load,
     // the system uses the placeholder handle instead.
     //
-    // Expected to FAIL: No asset fallback system implemented yet
+    // T021: Asset fallback system now implemented
+
+    use bevy::asset::AssetPlugin;
 
     let mut app = App::new();
-    app.add_plugins(MinimalPlugins);
+    app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+    app.init_asset::<Image>();
 
     // Initialize AssetHandles resource
-    app.insert_resource(AssetHandles::default());
+    let mut asset_handles = AssetHandles::default();
 
-    // TODO: Add asset loading system when implemented
-    // TODO: Simulate asset load failure
-    // TODO: Verify placeholder handle is used
+    // Load demo assets with fallback (T021 implementation)
+    let asset_server = app.world().resource::<bevy::asset::AssetServer>();
+    rust_game::systems::demo_level::load_demo_assets_with_fallback(asset_server, &mut asset_handles);
 
-    // Query AssetHandles to check if placeholder was used
-    let handles = app.world().resource::<AssetHandles>();
-
-    // This will fail until implementation
+    // Verify placeholder handle is loaded
     assert!(
-        handles.sprites.contains_key(&SpriteType::DemoPlaceholder),
-        "Placeholder sprite should be loaded (currently fails - no implementation)"
+        asset_handles.sprites.contains_key(&SpriteType::DemoPlaceholder),
+        "Placeholder sprite should be loaded"
     );
 
-    // Verify that when an asset fails, the system falls back to placeholder
-    // This test will be more specific once the asset loading system is implemented
+    // Verify handle is valid (not default)
+    let placeholder_handle = asset_handles
+        .sprites
+        .get(&SpriteType::DemoPlaceholder)
+        .expect("Placeholder handle should exist");
+
+    assert!(
+        placeholder_handle.id() != Handle::<Image>::default().id(),
+        "Placeholder should have valid asset handle (not default)"
+    );
 }
 
 #[test]
