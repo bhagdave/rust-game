@@ -199,13 +199,13 @@
 
 ### 3.4.10: Cleanup Systems
 
-- [ ] **T025** Implement `cleanup_demo_level` system in `src/systems/demo_level.rs`:
+- [X] **T025** Implement `cleanup_demo_level` system in `src/systems/demo_level.rs`:
   - Query all entities with `DemoMarker` component
   - Despawn all demo entities when transitioning away from demo
   - Reset any demo-specific state
   - Add to `OnExit` or similar transition hook (research GameMode transitions)
 
-- [ ] **T026** Add `pub mod demo_level;` to `src/systems/mod.rs` to expose demo systems
+- [X] **T026** Add `pub mod demo_level;` to `src/systems/mod.rs` to expose demo systems
 
 ## Phase 3.5: Integration
 **Note**: These tasks modify main.rs and must be sequential
