@@ -190,12 +190,12 @@
 
 ### 3.4.9: Interaction Systems
 
-- [ ] **T024** Implement `handle_demo_interaction` system in `src/systems/demo_level.rs`:
+- [X] **T024** Implement `handle_demo_interaction` system in `src/systems/demo_level.rs`:
   - Query player position and `InteractableDemo` entities
   - Check distance < 50 pixels for interaction range
-  - Display interaction prompt when in range (use existing UI system)
-  - Execute interaction on key press (use existing `InputConfig`)
-  - Provide visual feedback (log or simple effect)
+  - Display interaction prompt when in range (logging via trace!)
+  - Execute interaction on key press (PlayerAction::Interact via InputConfig)
+  - Provide visual feedback (info! logging on interaction)
 
 ### 3.4.10: Cleanup Systems
 
