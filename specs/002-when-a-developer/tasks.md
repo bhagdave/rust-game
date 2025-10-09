@@ -173,7 +173,7 @@
 
 ### 3.4.7: First-Run Detection
 
-- [ ] **T022** Implement first-run detection in `src/systems/demo_level.rs`:
+- [X] **T022** Implement first-run detection in `src/systems/demo_level.rs`:
   - Create `should_load_demo()` function
   - Check for save file existence using `directories` crate (existing dependency)
   - Return true if no save file exists (first run)
