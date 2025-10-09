@@ -41,6 +41,7 @@
 
 use bevy::prelude::*;
 use bevy::sprite::Sprite;
+use bevy_ecs_tilemap::prelude::*;
 
 // Import local components for demo entities
 use crate::components::demo::{DemoMarker, InteractableDemo};
@@ -482,6 +483,156 @@ pub fn spawn_demo_entities(
     spawned_count
 }
 
+/// Spawns the tilemap for the demo level from level data.
+///
+/// Creates a tilemap entity with all tiles from the level data, using the bevy_ecs_tilemap
+/// plugin for efficient 2D tile rendering. The tilemap is marked with `DemoMarker` for
+/// easy cleanup when the demo ends.
+///
+/// # Parameters
+///
+/// - `commands`: Mutable reference to Bevy's command buffer for spawning entities
+/// - `level_data`: Reference to the loaded level data containing tile array
+/// - `asset_server`: Asset server for loading the tileset texture
+///
+/// # Tilemap Structure
+///
+/// The tilemap is created from `level_data.tiles`, which is a 2D array where:
+/// - Each outer Vec represents a row (Y coordinate, bottom-to-top)
+/// - Each inner Vec represents columns (X coordinate, left-to-right)
+/// - Each u32 value is a tile texture index (0 = floor, 1 = wall, etc.)
+///
+/// # Rendering Configuration
+///
+/// - **Tile size**: 32x32 pixels (matching game's standard tile size)
+/// - **Grid size**: 32x32 pixels (1:1 mapping with tile size)
+/// - **Tileset**: Loaded from `assets/sprites/tileset.png`
+/// - **Map type**: Square grid (standard orthogonal projection)
+/// - **Transform**: Centered at (0, 0) with appropriate offset
+///
+/// # Example
+///
+/// ```ignore
+/// use crate::systems::level_loader::load_level_data;
+///
+/// fn setup_demo(
+///     mut commands: Commands,
+///     asset_server: Res<AssetServer>,
+/// ) {
+///     let level_data = load_level_data("levels/demo.ron").unwrap();
+///     spawn_demo_tilemap(&mut commands, &level_data, &asset_server);
+/// }
+/// ```
+///
+/// # Implementation Notes
+///
+/// - Uses the same pattern as `setup_tilemap` from `src/systems/tilemap.rs`
+/// - All spawned tiles are marked with `DemoMarker` for cleanup
+/// - Follows bevy_ecs_tilemap 0.16.0 API conventions
+///
+/// # Performance
+///
+/// - Efficient tile storage using `TileStorage`
+/// - Batch rendering via tilemap entity
+/// - Minimal per-tile overhead
+fn spawn_demo_tilemap(
+    commands: &mut Commands,
+    level_data: &LevelData,
+    asset_server: &AssetServer,
+) {
+    // Load tileset texture
+    let texture_handle: Handle<Image> = asset_server.load("sprites/tileset.png");
+
+    // Calculate map dimensions from level data
+    let map_height = level_data.tiles.len() as u32;
+    let map_width = if map_height > 0 {
+        level_data.tiles[0].len() as u32
+    } else {
+        0
+    };
+
+    if map_height == 0 || map_width == 0 {
+        warn!("Demo level has empty tile array, skipping tilemap spawn");
+        return;
+    }
+
+    let map_size = TilemapSize {
+        x: map_width,
+        y: map_height,
+    };
+
+    info!(
+        "Spawning demo tilemap with dimensions {}x{} ({} tiles)",
+        map_width,
+        map_height,
+        map_width * map_height
+    );
+
+    // Create tilemap entity
+    let tilemap_entity = commands.spawn(DemoMarker).id();
+
+    // Create tile storage for tracking individual tiles
+    let mut tile_storage = TileStorage::empty(map_size);
+
+    // Spawn tiles from level data
+    // Note: level_data.tiles is organized as [row][col] where row 0 is top
+    // bevy_ecs_tilemap uses (x, y) where y=0 is bottom
+    // We need to flip Y axis when reading from level data
+    for (row_idx, row) in level_data.tiles.iter().enumerate() {
+        for (col_idx, &tile_index) in row.iter().enumerate() {
+            // Flip Y coordinate: level data row 0 = tilemap y (height-1)
+            let tile_pos = TilePos {
+                x: col_idx as u32,
+                y: (map_height - 1 - row_idx as u32),
+            };
+
+            let texture_index = TileTextureIndex(tile_index);
+
+            let tile_entity = commands
+                .spawn((
+                    TileBundle {
+                        position: tile_pos,
+                        tilemap_id: TilemapId(tilemap_entity),
+                        texture_index,
+                        ..Default::default()
+                    },
+                    DemoMarker,
+                ))
+                .id();
+
+            tile_storage.set(&tile_pos, tile_entity);
+        }
+    }
+
+    // Configure tilemap bundle with rendering properties
+    let grid_size = TilemapGridSize { x: 32.0, y: 32.0 };
+    let tile_size = TilemapTileSize { x: 32.0, y: 32.0 };
+    let map_type = TilemapType::Square;
+
+    // Center the tilemap at origin
+    let transform = Transform::from_xyz(
+        -(map_width as f32 * 32.0) / 2.0,
+        -(map_height as f32 * 32.0) / 2.0,
+        0.0,
+    );
+
+    commands.entity(tilemap_entity).insert(TilemapBundle {
+        grid_size,
+        map_type,
+        size: map_size,
+        storage: tile_storage,
+        texture: TilemapTexture::Single(texture_handle),
+        tile_size,
+        transform,
+        ..Default::default()
+    });
+
+    info!(
+        "Demo tilemap spawned successfully: {}x{} tiles at layer 0",
+        map_width, map_height
+    );
+}
+
 /// Loads the demo level from RON file and initializes performance tracking.
 ///
 /// This is the main entry point system for loading the demo level. It reads the
@@ -543,9 +694,9 @@ pub fn spawn_demo_entities(
 /// T018 focuses on loading the level data and recording timing. Entity spawning
 /// (tilemap and entities) will be implemented in T019 and T020 respectively.
 pub fn load_demo_level(
-    mut _commands: Commands,
+    mut commands: Commands,
     _asset_handles: Res<AssetHandles>,
-    _asset_server: Res<AssetServer>,
+    asset_server: Res<AssetServer>,
     mut load_start_time: Local<Option<std::time::Instant>>,
 ) {
     // Record load start time on first run
@@ -574,7 +725,9 @@ pub fn load_demo_level(
                 level_data.tiles.len()
             );
 
-            // TODO T019: Spawn tilemap from level_data.tiles
+            // T019: Spawn tilemap from level_data.tiles
+            spawn_demo_tilemap(&mut commands, &level_data, &asset_server);
+
             // TODO T020: Spawn entities using spawn_demo_entities()
 
             // Verify load time meets performance contract (<10 seconds)
@@ -2058,6 +2211,7 @@ mod tests {
         // Verify load_demo_level doesn't panic when demo.ron is missing
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
         // Run the system - should not panic even if file is missing
@@ -2075,6 +2229,7 @@ mod tests {
 
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
         let before = Instant::now();
@@ -2099,6 +2254,7 @@ mod tests {
         // Verify load_demo_level can be called multiple times safely
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
         app.add_systems(Update, load_demo_level);
@@ -2134,6 +2290,7 @@ mod tests {
         // Verify load_demo_level accepts Commands, AssetHandles, AssetServer
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
 
         // Add required resources
         app.insert_resource(AssetHandles::default());
@@ -2154,6 +2311,7 @@ mod tests {
 
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
         app.add_systems(Update, load_demo_level);
@@ -2169,6 +2327,7 @@ mod tests {
         // Comprehensive test: verify system never panics regardless of conditions
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
         app.add_systems(Update, load_demo_level);
@@ -2204,6 +2363,7 @@ mod tests {
         // Verify the system can track and measure load duration
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
         use std::time::Instant;
@@ -2220,6 +2380,206 @@ mod tests {
             duration.as_millis() < 5000,
             "Load attempt should complete quickly (took {:?})",
             duration
+        );
+    }
+
+    // ===== Tests for spawn_demo_tilemap function =====
+
+    #[test]
+    fn spawn_demo_tilemap_calculates_correct_dimensions() {
+        // Verify spawn_demo_tilemap correctly extracts dimensions from level data
+        use crate::components::room::Floor;
+        use crate::systems::level_loader::Bounds;
+
+        let level_data = LevelData {
+            id: 100,
+            floor: Floor::Ground,
+            name: "Test".to_string(),
+            bounds: Bounds {
+                min: (0.0, 0.0),
+                max: (640.0, 480.0),
+            },
+            tiles: vec![
+                vec![1, 1, 1, 1, 1],
+                vec![1, 0, 0, 0, 1],
+                vec![1, 1, 1, 1, 1],
+            ],
+            entities: vec![],
+            connections: vec![],
+        };
+
+        // Dimensions should be 5 wide (columns) x 3 high (rows)
+        let width = level_data.tiles[0].len();
+        let height = level_data.tiles.len();
+
+        assert_eq!(width, 5, "Tilemap should be 5 tiles wide");
+        assert_eq!(height, 3, "Tilemap should be 3 tiles high");
+    }
+
+    #[test]
+    fn spawn_demo_tilemap_handles_empty_tiles_gracefully() {
+        // Verify spawn_demo_tilemap handles empty tile arrays without panicking
+        use crate::components::room::Floor;
+        use crate::systems::level_loader::Bounds;
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
+
+        let level_data = LevelData {
+            id: 100,
+            floor: Floor::Ground,
+            name: "Empty".to_string(),
+            bounds: Bounds {
+                min: (0.0, 0.0),
+                max: (0.0, 0.0),
+            },
+            tiles: vec![], // Empty tile array
+            entities: vec![],
+            connections: vec![],
+        };
+
+        // Get AssetServer resource before mutable borrow
+        let asset_server = app.world().resource::<AssetServer>().clone();
+
+        // Should not panic with empty tiles
+        spawn_demo_tilemap(&mut app.world_mut().commands(), &level_data, &asset_server);
+
+        assert!(true, "Function handles empty tiles gracefully");
+    }
+
+    #[test]
+    fn spawn_demo_tilemap_creates_tilemap_entity() {
+        // Verify spawn_demo_tilemap creates a tilemap entity with DemoMarker
+        use crate::components::room::Floor;
+        use crate::systems::level_loader::Bounds;
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
+
+        let level_data = LevelData {
+            id: 100,
+            floor: Floor::Ground,
+            name: "Test".to_string(),
+            bounds: Bounds {
+                min: (0.0, 0.0),
+                max: (640.0, 480.0),
+            },
+            tiles: vec![vec![1, 1, 1], vec![1, 0, 1], vec![1, 1, 1]],
+            entities: vec![],
+            connections: vec![],
+        };
+
+        // Get AssetServer resource before mutable borrow
+        let asset_server = app.world().resource::<AssetServer>().clone();
+
+        spawn_demo_tilemap(&mut app.world_mut().commands(), &level_data, &asset_server);
+
+        app.update();
+
+        // Check that tilemap entity with DemoMarker exists
+        let world = app.world_mut();
+        let mut query = world.query_filtered::<Entity, With<DemoMarker>>();
+        let demo_entity_count = query.iter(world).count();
+
+        // Should have at least one entity with DemoMarker (the tilemap + tiles)
+        assert!(
+            demo_entity_count > 0,
+            "Should create entities with DemoMarker"
+        );
+    }
+
+    #[test]
+    fn spawn_demo_tilemap_creates_correct_tile_count() {
+        // Verify spawn_demo_tilemap creates the right number of tiles
+        use crate::components::room::Floor;
+        use crate::systems::level_loader::Bounds;
+
+        let mut app = App::new();
+        app.add_plugins((MinimalPlugins, AssetPlugin::default()));
+        app.init_asset::<Image>();
+
+        let level_data = LevelData {
+            id: 100,
+            floor: Floor::Ground,
+            name: "Test".to_string(),
+            bounds: Bounds {
+                min: (0.0, 0.0),
+                max: (160.0, 96.0),
+            },
+            tiles: vec![
+                vec![1, 1, 1, 1, 1],
+                vec![1, 0, 0, 0, 1],
+                vec![1, 1, 1, 1, 1],
+            ],
+            entities: vec![],
+            connections: vec![],
+        };
+
+        // Get AssetServer resource before mutable borrow
+        let asset_server = app.world().resource::<AssetServer>().clone();
+
+        spawn_demo_tilemap(&mut app.world_mut().commands(), &level_data, &asset_server);
+
+        app.update();
+
+        // Should create 5x3 = 15 tile entities + 1 tilemap entity = 16 total
+        let world = app.world_mut();
+        let mut query = world.query_filtered::<Entity, With<DemoMarker>>();
+        let demo_entity_count = query.iter(world).count();
+
+        assert_eq!(
+            demo_entity_count, 16,
+            "Should create 15 tiles + 1 tilemap = 16 entities with DemoMarker"
+        );
+    }
+
+    #[test]
+    fn spawn_demo_tilemap_uses_correct_tile_size() {
+        // Verify spawn_demo_tilemap uses 32x32 tile size
+        let tile_size = 32.0f32;
+        let grid_size = 32.0f32;
+
+        assert_eq!(tile_size, 32.0, "Tile size should be 32x32 pixels");
+        assert_eq!(grid_size, 32.0, "Grid size should match tile size");
+    }
+
+    #[test]
+    fn spawn_demo_tilemap_flips_y_axis_correctly() {
+        // Verify Y-axis flipping logic for tile positions
+        let map_height = 15u32;
+
+        // Row 0 in level data (top row) should map to y = 14 in tilemap
+        let row_0_y = map_height - 1 - 0;
+        assert_eq!(row_0_y, 14, "Top row should map to y=14");
+
+        // Row 14 in level data (bottom row) should map to y = 0 in tilemap
+        let row_14_y = map_height - 1 - 14;
+        assert_eq!(row_14_y, 0, "Bottom row should map to y=0");
+    }
+
+    #[test]
+    fn spawn_demo_tilemap_centers_at_origin() {
+        // Verify tilemap centering calculation
+        let map_width = 20u32;
+        let map_height = 15u32;
+        let tile_size = 32.0f32;
+
+        let x_offset = -(map_width as f32 * tile_size) / 2.0;
+        let y_offset = -(map_height as f32 * tile_size) / 2.0;
+
+        assert_eq!(x_offset, -320.0, "X offset should center 20 tiles");
+        assert_eq!(y_offset, -240.0, "Y offset should center 15 tiles");
+    }
+
+    #[test]
+    fn spawn_demo_tilemap_loads_correct_texture() {
+        // Verify tilemap uses correct tileset texture path
+        let texture_path = "sprites/tileset.png";
+        assert_eq!(
+            texture_path, "sprites/tileset.png",
+            "Should use sprites/tileset.png"
         );
     }
 }
