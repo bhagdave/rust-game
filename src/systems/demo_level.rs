@@ -49,7 +49,7 @@ use crate::components::player::{Health, JumpState, Player, Velocity};
 use crate::components::room::{Door, DoorState};
 
 // Import level data structures for loading demo level
-use crate::systems::level_loader::EntitySpawn;
+use crate::systems::level_loader::{EntitySpawn, LevelData};
 
 use crate::resources::asset_handles::{AssetHandles, SpriteType};
 
@@ -423,7 +423,7 @@ pub fn spawn_item(
 /// - Must track and return total entity count
 /// - Must log warnings for unrecognized entity types
 pub fn spawn_demo_entities(
-    level_data: &crate::systems::level_loader::LevelData,
+    level_data: &LevelData,
     commands: &mut Commands,
     asset_handles: &AssetHandles,
 ) -> usize {
@@ -1551,5 +1551,374 @@ mod tests {
             world.get::<Collectible>(key_entity).is_some(),
             "Key should have Collectible component"
         );
+    }
+
+    // Tests for spawn_demo_entities orchestrator function
+
+    // Helper function to create test LevelData with minimal required fields
+    fn create_test_level_data(entities: Vec<EntitySpawn>) -> LevelData {
+        use crate::components::room::Floor;
+        use crate::systems::level_loader::Bounds;
+
+        LevelData {
+            id: 0,
+            floor: Floor::Ground,
+            name: "Test Level".to_string(),
+            bounds: Bounds {
+                min: (0.0, 0.0),
+                max: (1000.0, 1000.0),
+            },
+            tiles: vec![],
+            entities,
+            connections: vec![],
+        }
+    }
+
+    #[test]
+    fn spawn_demo_entities_returns_correct_count() {
+        // Verify spawn_demo_entities returns the count of spawned entities
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![
+            EntitySpawn {
+                entity_type: "PlayerSpawn".to_string(),
+                position: (100.0, 100.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Door".to_string(),
+                position: (200.0, 100.0),
+                target_room: Some(1),
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Match".to_string(),
+                position: (150.0, 150.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+        ]);
+
+        let asset_handles = AssetHandles::default();
+        let count =
+            spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        assert_eq!(count, 3, "Should return count of 3 spawned entities");
+    }
+
+    #[test]
+    fn spawn_demo_entities_spawns_player() {
+        // Verify spawn_demo_entities correctly spawns PlayerSpawn entities
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![EntitySpawn {
+            entity_type: "PlayerSpawn".to_string(),
+            position: (100.0, 100.0),
+            target_room: None,
+            locked: None,
+            key_type: None,
+        }]);
+
+        let asset_handles = AssetHandles::default();
+        spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        app.update();
+
+        // Query for player entities
+        let world = app.world_mut();
+        let mut query = world.query_filtered::<Entity, With<Player>>();
+        let player_count = query.iter(world).count();
+
+        assert_eq!(player_count, 1, "Should spawn exactly one player");
+    }
+
+    #[test]
+    fn spawn_demo_entities_spawns_doors() {
+        // Verify spawn_demo_entities correctly spawns Door entities
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![
+            EntitySpawn {
+                entity_type: "Door".to_string(),
+                position: (200.0, 100.0),
+                target_room: Some(1),
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Door".to_string(),
+                position: (300.0, 100.0),
+                target_room: Some(2),
+                locked: Some(KeyType::Brass),
+                key_type: None,
+            },
+        ]);
+
+        let asset_handles = AssetHandles::default();
+        spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        app.update();
+
+        // Query for door entities
+        let world = app.world_mut();
+        let mut query = world.query_filtered::<Entity, With<Door>>();
+        let door_count = query.iter(world).count();
+
+        assert_eq!(door_count, 2, "Should spawn exactly two doors");
+    }
+
+    #[test]
+    fn spawn_demo_entities_spawns_items() {
+        // Verify spawn_demo_entities correctly spawns Match and Key entities
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![
+            EntitySpawn {
+                entity_type: "Match".to_string(),
+                position: (150.0, 150.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Key".to_string(),
+                position: (160.0, 150.0),
+                target_room: None,
+                locked: None,
+                key_type: Some(KeyType::Brass),
+            },
+        ]);
+
+        let asset_handles = AssetHandles::default();
+        spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        app.update();
+
+        // Query for collectible items
+        let world = app.world_mut();
+        let mut query = world.query_filtered::<Entity, With<Collectible>>();
+        let item_count = query.iter(world).count();
+
+        assert_eq!(item_count, 2, "Should spawn exactly two items");
+    }
+
+    #[test]
+    fn spawn_demo_entities_handles_mixed_entity_types() {
+        // Verify spawn_demo_entities correctly handles a level with all entity types
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![
+            EntitySpawn {
+                entity_type: "PlayerSpawn".to_string(),
+                position: (100.0, 100.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Door".to_string(),
+                position: (200.0, 100.0),
+                target_room: Some(1),
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Match".to_string(),
+                position: (150.0, 150.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Key".to_string(),
+                position: (160.0, 150.0),
+                target_room: None,
+                locked: None,
+                key_type: Some(KeyType::Iron),
+            },
+        ]);
+
+        let asset_handles = AssetHandles::default();
+        let count =
+            spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        app.update();
+
+        assert_eq!(count, 4, "Should return count of 4 entities");
+
+        let world = app.world_mut();
+
+        // Verify player spawned
+        let mut player_query = world.query_filtered::<Entity, With<Player>>();
+        assert_eq!(player_query.iter(world).count(), 1, "Should have 1 player");
+
+        // Verify door spawned
+        let mut door_query = world.query_filtered::<Entity, With<Door>>();
+        assert_eq!(door_query.iter(world).count(), 1, "Should have 1 door");
+
+        // Verify items spawned
+        let mut item_query = world.query_filtered::<Entity, With<Collectible>>();
+        assert_eq!(item_query.iter(world).count(), 2, "Should have 2 items");
+    }
+
+    #[test]
+    fn spawn_demo_entities_skips_unknown_entity_types() {
+        // Verify spawn_demo_entities skips unknown entity types without panicking
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![
+            EntitySpawn {
+                entity_type: "PlayerSpawn".to_string(),
+                position: (100.0, 100.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "UnknownType".to_string(),
+                position: (200.0, 200.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Match".to_string(),
+                position: (150.0, 150.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+        ]);
+
+        let asset_handles = AssetHandles::default();
+        let count =
+            spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        // Should skip the unknown type but spawn the other two
+        assert_eq!(count, 2, "Should return count of 2 (skipping unknown type)");
+    }
+
+    #[test]
+    fn spawn_demo_entities_handles_empty_entity_list() {
+        // Verify spawn_demo_entities handles level with no entities gracefully
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![]);
+
+        let asset_handles = AssetHandles::default();
+        let count =
+            spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        assert_eq!(count, 0, "Should return count of 0 for empty entity list");
+    }
+
+    #[test]
+    fn spawn_demo_entities_all_entities_have_demo_marker() {
+        // Verify all entities spawned by spawn_demo_entities have DemoMarker
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![
+            EntitySpawn {
+                entity_type: "PlayerSpawn".to_string(),
+                position: (100.0, 100.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Door".to_string(),
+                position: (200.0, 100.0),
+                target_room: Some(1),
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "Match".to_string(),
+                position: (150.0, 150.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+        ]);
+
+        let asset_handles = AssetHandles::default();
+        let count =
+            spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        app.update();
+
+        // Query for all entities with DemoMarker
+        let world = app.world_mut();
+        let mut query = world.query_filtered::<Entity, With<DemoMarker>>();
+        let demo_entity_count = query.iter(world).count();
+
+        assert_eq!(
+            demo_entity_count, count,
+            "All spawned entities should have DemoMarker"
+        );
+        assert_eq!(
+            demo_entity_count, 3,
+            "Should have 3 entities with DemoMarker"
+        );
+    }
+
+    #[test]
+    fn spawn_demo_entities_spawns_multiple_players() {
+        // Verify spawn_demo_entities can spawn multiple PlayerSpawn entities
+        // (useful for testing scenarios)
+        let mut app = App::new();
+        app.add_plugins(MinimalPlugins);
+        app.insert_resource(AssetHandles::default());
+
+        let level_data = create_test_level_data(vec![
+            EntitySpawn {
+                entity_type: "PlayerSpawn".to_string(),
+                position: (100.0, 100.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+            EntitySpawn {
+                entity_type: "PlayerSpawn".to_string(),
+                position: (200.0, 100.0),
+                target_room: None,
+                locked: None,
+                key_type: None,
+            },
+        ]);
+
+        let asset_handles = AssetHandles::default();
+        let count =
+            spawn_demo_entities(&level_data, &mut app.world_mut().commands(), &asset_handles);
+
+        app.update();
+
+        assert_eq!(count, 2, "Should return count of 2");
+
+        let world = app.world_mut();
+        let mut query = world.query_filtered::<Entity, With<Player>>();
+        let player_count = query.iter(world).count();
+
+        assert_eq!(player_count, 2, "Should spawn two player entities");
     }
 }
