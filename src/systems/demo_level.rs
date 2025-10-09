@@ -1088,8 +1088,8 @@ fn check_first_run(mut checked: Local<bool>) {
 /// # Visual Feedback
 ///
 /// Currently provides feedback via logging:
-/// - "Interaction available: [prompt]" when in range
-/// - "Executed interaction with: [object_id]" when interaction occurs
+/// - "Interaction available: \[prompt\]" when in range
+/// - "Executed interaction with: \[object_id\]" when interaction occurs
 ///
 /// Future enhancement: Integrate with UI system for on-screen prompts
 ///
@@ -3784,6 +3784,7 @@ mod tests {
     // ===== T024: Interaction System Tests =====
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_system_compiles() {
         // Verify handle_demo_interaction system signature is valid
         let mut app = App::new();
@@ -3796,6 +3797,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_handles_no_player() {
         // Verify system doesn't panic when no player entity exists
         let mut app = App::new();
@@ -3809,6 +3811,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_handles_no_interactables() {
         // Verify system doesn't panic when no interactable entities exist
         use crate::resources::input_config::default_input_map;
@@ -3831,6 +3834,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_calculates_distance() {
         // Verify system calculates distance correctly
         use crate::resources::input_config::default_input_map;
@@ -3873,6 +3877,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_respects_50_pixel_range() {
         // Verify interaction range is exactly 50 pixels
         use crate::resources::input_config::default_input_map;
@@ -3906,6 +3911,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_finds_nearest_object() {
         // Verify system finds nearest interactable when multiple are in range
         use crate::resources::input_config::default_input_map;
@@ -3947,6 +3953,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_uses_euclidean_distance() {
         // Verify system uses Euclidean distance (not Manhattan)
         use crate::resources::input_config::default_input_map;
@@ -3980,6 +3987,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_checks_interact_action() {
         // Verify system checks for PlayerAction::Interact
         use crate::resources::input_config::default_input_map;
@@ -4017,6 +4025,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn handle_demo_interaction_contract_compliance() {
         // Verify system meets all T024 requirements
         // From tasks.md T024:
