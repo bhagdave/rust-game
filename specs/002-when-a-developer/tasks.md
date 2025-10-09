@@ -139,7 +139,7 @@
 
 ### 3.4.5: Demo Level Loading System
 
-- [ ] **T018** Implement `load_demo_level` system in `src/systems/demo_level.rs`:
+- [X] **T018** Implement `load_demo_level` system in `src/systems/demo_level.rs`:
   - System signature with Commands, AssetHandles, AssetServer resources
   - Load demo level using existing `load_level_data("levels/demo.ron")` function
   - Record load start time with `Instant::now()` for performance measurement
