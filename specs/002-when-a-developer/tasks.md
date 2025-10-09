@@ -154,7 +154,7 @@
   - Set tilemap position and layer order
   - Log tilemap spawn success with dimensions
 
-- [ ] **T020** Extend `load_demo_level` system to spawn entities:
+- [X] **T020** Extend `load_demo_level` system to spawn entities:
   - Call `spawn_demo_entities()` with level_data, commands, and asset_handles
   - Extract player spawn position from spawned entities
   - Log successful demo load with level name and entity count
