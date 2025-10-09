@@ -29,11 +29,16 @@ fn placeholder_handle_used_when_asset_fails() {
 
     // Load demo assets with fallback (T021 implementation)
     let asset_server = app.world().resource::<bevy::asset::AssetServer>();
-    rust_game::systems::demo_level::load_demo_assets_with_fallback(asset_server, &mut asset_handles);
+    rust_game::systems::demo_level::load_demo_assets_with_fallback(
+        asset_server,
+        &mut asset_handles,
+    );
 
     // Verify placeholder handle is loaded
     assert!(
-        asset_handles.sprites.contains_key(&SpriteType::DemoPlaceholder),
+        asset_handles
+            .sprites
+            .contains_key(&SpriteType::DemoPlaceholder),
         "Placeholder sprite should be loaded"
     );
 

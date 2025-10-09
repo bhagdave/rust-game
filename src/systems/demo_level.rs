@@ -1512,7 +1512,7 @@ mod tests {
         app.add_plugins(MinimalPlugins);
         app.insert_resource(AssetHandles::default());
 
-        let key_types = vec![
+        let key_types = [
             KeyType::Brass,
             KeyType::Iron,
             KeyType::Ornate,
@@ -1850,7 +1850,7 @@ mod tests {
         app.add_plugins(MinimalPlugins);
         app.insert_resource(AssetHandles::default());
 
-        let key_types = vec![
+        let key_types = [
             KeyType::Brass,
             KeyType::Iron,
             KeyType::Ornate,
@@ -2890,7 +2890,9 @@ mod tests {
 
         // Verify placeholder key exists
         assert!(
-            asset_handles.sprites.contains_key(&SpriteType::DemoPlaceholder),
+            asset_handles
+                .sprites
+                .contains_key(&SpriteType::DemoPlaceholder),
             "Placeholder sprite should be inserted into AssetHandles"
         );
 
@@ -2919,7 +2921,13 @@ mod tests {
         // Should not panic
         load_demo_assets_with_fallback(asset_server, &mut asset_handles);
 
-        assert!(true, "Function completed without panic");
+        // Verify function executed (placeholder was inserted)
+        assert!(
+            asset_handles
+                .sprites
+                .contains_key(&SpriteType::DemoPlaceholder),
+            "Function completed without panic and inserted placeholder"
+        );
     }
 
     #[test]
@@ -2939,7 +2947,9 @@ mod tests {
 
         // Should still have exactly one placeholder entry
         assert!(
-            asset_handles.sprites.contains_key(&SpriteType::DemoPlaceholder),
+            asset_handles
+                .sprites
+                .contains_key(&SpriteType::DemoPlaceholder),
             "Placeholder should exist after multiple calls"
         );
 
@@ -3051,7 +3061,9 @@ mod tests {
         // MUST: Load placeholder sprite first and insert into AssetHandles
         load_demo_assets_with_fallback(asset_server, &mut asset_handles);
         assert!(
-            asset_handles.sprites.contains_key(&SpriteType::DemoPlaceholder),
+            asset_handles
+                .sprites
+                .contains_key(&SpriteType::DemoPlaceholder),
             "Contract: MUST insert placeholder into AssetHandles"
         );
 
@@ -3061,6 +3073,14 @@ mod tests {
         // MUST: Return placeholder handle for failed assets
         // (Future enhancement - current implementation establishes infrastructure)
 
-        assert!(true, "All contract requirements met");
+        // Verify all contract requirements are met by checking handle exists
+        let placeholder_handle = asset_handles
+            .sprites
+            .get(&SpriteType::DemoPlaceholder)
+            .expect("Placeholder handle must exist");
+        assert!(
+            placeholder_handle.id() != Handle::<Image>::default().id(),
+            "All contract requirements met - valid placeholder handle exists"
+        );
     }
 }
