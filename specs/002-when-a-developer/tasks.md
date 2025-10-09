@@ -181,10 +181,10 @@
 
 ### 3.4.8: Demo Plugin Architecture
 
-- [ ] **T023** Create `DemoPlugin` struct in `src/systems/demo_level.rs`:
+- [X] **T023** Create `DemoPlugin` struct in `src/systems/demo_level.rs`:
   - Implement `Plugin` trait for `DemoPlugin`
   - In `build()`: Register demo level systems in `Startup` and `Update` schedules
-  - System ordering: `init_demo` (Startup) → `load_demo_on_first_run` (Update)
+  - System ordering: `init_demo` (Startup) → `check_first_run` + `load_demo_level` (Update, chained)
   - Use `Local<bool>` state to ensure demo loads only once
   - Follow existing plugin pattern from `FixedTimestepPlugin`
 
