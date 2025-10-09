@@ -558,9 +558,7 @@ pub fn load_demo_level(
     match crate::systems::level_loader::load_level_data("levels/demo.ron") {
         Ok(level_data) => {
             // Calculate load duration
-            let load_duration = load_start_time
-                .unwrap()
-                .elapsed();
+            let load_duration = load_start_time.unwrap().elapsed();
 
             info!(
                 "Successfully loaded demo level '{}' (ID: {}, Floor: {:?}) in {:.2}s",
@@ -590,7 +588,9 @@ pub fn load_demo_level(
         Err(error) => {
             // Handle load errors gracefully without panicking
             warn!("Failed to load demo level: {}", error);
-            warn!("Demo level will not be available. Please check that assets/levels/demo.ron exists.");
+            warn!(
+                "Demo level will not be available. Please check that assets/levels/demo.ron exists."
+            );
 
             // Reset load start time so we can retry if needed
             *load_start_time = None;
