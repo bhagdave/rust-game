@@ -4190,6 +4190,7 @@ mod tests {
     // ===== T025: Cleanup System Tests =====
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn cleanup_demo_level_system_compiles() {
         // Verify cleanup_demo_level system signature is valid
         let mut app = App::new();
@@ -4202,6 +4203,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::assertions_on_constants)]
     fn cleanup_demo_level_handles_no_entities() {
         // Verify system doesn't panic when no demo entities exist
         let mut app = App::new();
