@@ -535,11 +535,7 @@ pub fn spawn_demo_entities(
 /// - Efficient tile storage using `TileStorage`
 /// - Batch rendering via tilemap entity
 /// - Minimal per-tile overhead
-fn spawn_demo_tilemap(
-    commands: &mut Commands,
-    level_data: &LevelData,
-    asset_server: &AssetServer,
-) {
+fn spawn_demo_tilemap(commands: &mut Commands, level_data: &LevelData, asset_server: &AssetServer) {
     // Load tileset texture
     let texture_handle: Handle<Image> = asset_server.load("sprites/tileset.png");
 
