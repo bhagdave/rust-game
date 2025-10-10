@@ -127,10 +127,10 @@ pub fn spawn_player(
             DemoMarker,
             Sprite {
                 image: sprite_handle,
+                custom_size: Some(Vec2::new(64.0, 64.0)), // Scale 32x32 sprite to 64x64
                 ..default()
             },
-            Transform::from_translation(position.extend(0.0)),
-            Visibility::Visible,
+            Transform::from_translation(position.extend(10.0)), // Z=10 to render above tilemap
         ))
         .id();
 
@@ -241,10 +241,10 @@ pub fn spawn_door(
             DemoMarker,
             Sprite {
                 image: sprite_handle,
+                custom_size: Some(Vec2::new(64.0, 64.0)), // Scale 32x32 sprite to 64x64
                 ..default()
             },
-            Transform::from_translation(position.extend(0.0)),
-            Visibility::Visible,
+            Transform::from_translation(position.extend(10.0)), // Z=10 to render above tilemap
         ))
         .id();
 
@@ -373,10 +373,10 @@ pub fn spawn_item(
             DemoMarker,
             Sprite {
                 image: sprite_handle,
+                custom_size: Some(Vec2::new(48.0, 48.0)), // Scale items slightly smaller than player
                 ..default()
             },
-            Transform::from_translation(position.extend(0.0)),
-            Visibility::Visible,
+            Transform::from_translation(position.extend(10.0)), // Z=10 to render above tilemap
         ))
         .id();
 
@@ -1190,7 +1190,11 @@ impl Plugin for DemoPlugin {
 /// - `GameState` resource and `GameMode` enum
 fn init_demo_system(mut commands: Commands, mut game_state: ResMut<GameState>) {
     // Spawn camera for the demo level (required to see anything in Bevy)
-    commands.spawn(Camera2d);
+    // Position camera at center of 1920x1080 level to see all entities
+    commands.spawn((
+        Camera2d,
+        Transform::from_xyz(960.0, 540.0, 999.0), // Center of level, high Z to see everything
+    ));
     info!("Spawned 2D camera for demo level");
 
     // Check if this is the first run (no save file exists)
