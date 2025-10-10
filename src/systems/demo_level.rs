@@ -1129,7 +1129,7 @@ impl Plugin for DemoPlugin {
 /// - `GameState` resource and `GameMode` enum
 fn init_demo_system(mut commands: Commands, mut game_state: ResMut<GameState>) {
     // Spawn camera for the demo level (required to see anything in Bevy)
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
     info!("Spawned 2D camera for demo level");
 
     // Check if this is the first run (no save file exists)
@@ -2937,8 +2937,6 @@ mod tests {
         app.add_plugins(MinimalPlugins);
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -2946,8 +2944,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         // Add the system - it should compile and be callable
         app.add_systems(Update, load_demo_level);
@@ -2964,8 +2960,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -2973,8 +2967,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         // Run the system - should not panic even if file is missing
         app.add_systems(Update, load_demo_level);
@@ -3024,8 +3016,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3033,8 +3023,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         app.add_systems(Update, load_demo_level);
 
@@ -3057,8 +3045,6 @@ mod tests {
         app.add_plugins(MinimalPlugins);
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3066,8 +3052,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         // The system signature requires Local<Option<Instant>>
         // If this compiles, the Local state is correctly typed
@@ -3085,12 +3069,12 @@ mod tests {
 
         // Add required resources
         app.insert_resource(AssetHandles::default());
-        
+
         // T028: Add GameState with GameMode::Playing for load_demo_level
         let mut game_state = GameState::default();
         game_state.game_mode = GameMode::Playing;
         app.insert_resource(game_state);
-        
+
         // AssetServer is provided by AssetPlugin
 
         // System should accept these resources
@@ -3111,8 +3095,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3120,8 +3102,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         app.add_systems(Update, load_demo_level);
         app.update();
@@ -3139,8 +3119,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3148,8 +3126,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         app.add_systems(Update, load_demo_level);
 
@@ -3419,8 +3395,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3428,8 +3402,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         app.add_systems(Update, load_demo_level);
 
@@ -3466,8 +3438,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3475,8 +3445,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         app.add_systems(Update, load_demo_level);
         app.update();
@@ -3570,8 +3538,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3579,8 +3545,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         app.add_systems(Update, load_demo_level);
         app.update();
@@ -3600,8 +3564,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3609,8 +3571,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         app.add_systems(Update, load_demo_level);
 
@@ -3634,8 +3594,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -3643,8 +3601,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         app.add_systems(Update, load_demo_level);
 
@@ -4241,8 +4197,6 @@ mod tests {
         app.init_asset::<Image>();
         app.insert_resource(AssetHandles::default());
 
-        
-
         // T028: Add GameState with GameMode::Playing for load_demo_level
 
         let mut game_state = GameState::default();
@@ -4250,8 +4204,6 @@ mod tests {
         game_state.game_mode = GameMode::Playing;
 
         app.insert_resource(game_state);
-
-        
 
         // Add plugin
         app.add_plugins(plugin);
@@ -4976,7 +4928,10 @@ mod tests {
 
         // System should have passed the GameMode check and attempted loading
         // Even if loading fails (missing demo.ron), it shouldn't panic
-        assert!(true, "load_demo_level attempts loading when GameMode::Playing");
+        assert!(
+            true,
+            "load_demo_level attempts loading when GameMode::Playing"
+        );
     }
 
     #[test]
@@ -5030,7 +4985,10 @@ mod tests {
         }
 
         // Should not panic even with multiple runs
-        assert!(true, "load_demo_level remains idempotent with GameMode check");
+        assert!(
+            true,
+            "load_demo_level remains idempotent with GameMode check"
+        );
     }
 
     #[test]
@@ -5122,7 +5080,11 @@ mod tests {
         assert!(
             matches!(
                 game_mode,
-                GameMode::Menu | GameMode::Playing | GameMode::Paused | GameMode::GameOver | GameMode::Victory
+                GameMode::Menu
+                    | GameMode::Playing
+                    | GameMode::Paused
+                    | GameMode::GameOver
+                    | GameMode::Victory
             ),
             "Uses existing GameMode enum"
         );
