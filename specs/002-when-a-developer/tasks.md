@@ -217,7 +217,7 @@
   - Add `AssetHandles` resource if not already present
   - Test that game compiles: `cargo build`
 
-- [ ] **T028** Configure demo to auto-load on first run in `src/systems/demo_level.rs`:
+- [X] **T028** Configure demo to auto-load on first run in `src/systems/demo_level.rs`:
   - In `Startup` schedule: Check `should_load_demo()` and set `GameMode::Playing`
   - In `Update` schedule with `Local<bool>`: Load demo if mode is Playing and not yet loaded
   - Ensure compatibility with existing `GameState` resource (not Bevy State<T>)
