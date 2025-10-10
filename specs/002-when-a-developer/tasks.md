@@ -210,7 +210,7 @@
 ## Phase 3.5: Integration
 **Note**: These tasks modify main.rs and must be sequential
 
-- [ ] **T027** Integrate `DemoPlugin` into `src/main.rs`:
+- [X] **T027** Integrate `DemoPlugin` into `src/main.rs`:
   - Import `DemoPlugin` from `rust_game::systems::demo_level`
   - Add `.add_plugins(DemoPlugin)` to app builder after DefaultPlugins
   - Ensure `GameState` resource is initialized before DemoPlugin systems run

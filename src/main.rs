@@ -1,4 +1,7 @@
 use bevy::prelude::*;
+use rust_game::resources::asset_handles::AssetHandles;
+use rust_game::resources::game_state::GameState;
+use rust_game::systems::demo_level::DemoPlugin;
 
 fn main() {
     App::new()
@@ -10,5 +13,8 @@ fn main() {
             }),
             ..default()
         }))
+        .init_resource::<AssetHandles>()
+        .init_resource::<GameState>()
+        .add_plugins(DemoPlugin)
         .run();
 }
