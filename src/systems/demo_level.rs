@@ -997,10 +997,7 @@ pub fn cleanup_demo_level(mut commands: Commands, demo_entities: Query<Entity, W
 
     // Log cleanup action
     if entity_count > 0 {
-        info!(
-            "Cleaned up demo level: despawned {} entities",
-            entity_count
-        );
+        info!("Cleaned up demo level: despawned {} entities", entity_count);
     } else {
         debug!("Demo cleanup called but no demo entities found");
     }
@@ -3508,7 +3505,10 @@ mod tests {
         // Verify function never panics, even with no save directory
         let result = should_load_demo();
         // Function completed successfully - verify result is a valid boolean
-        assert!(result || !result, "Function completed without panic and returned valid boolean");
+        assert!(
+            result || !result,
+            "Function completed without panic and returned valid boolean"
+        );
     }
 
     #[test]
@@ -3732,7 +3732,10 @@ mod tests {
         // Add system manually to verify it compiles
         app.add_systems(Update, check_first_run);
 
-        assert!(true, "check_first_run system compiles with correct signature");
+        assert!(
+            true,
+            "check_first_run system compiles with correct signature"
+        );
     }
 
     #[test]
@@ -3807,7 +3810,10 @@ mod tests {
         app.update();
 
         // If we reach here, system ordering is correct
-        assert!(true, "System ordering: init_demo (Startup) → check_first_run + load_demo_level (Update)");
+        assert!(
+            true,
+            "System ordering: init_demo (Startup) → check_first_run + load_demo_level (Update)"
+        );
     }
 
     #[test]
