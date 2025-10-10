@@ -86,9 +86,12 @@ pub fn player_movement_system(
         // 4. Prevent movement through walls (horizontal collision)
 
         // Simple ground check (placeholder until collision system exists)
-        // If player falls below y = 0, treat as ground
-        if transform.translation.y <= 0.0 {
-            transform.translation.y = 0.0;
+        // Tilemap is 15 tiles high (480 pixels), centered at y=0
+        // Bottom wall is at y = -240 + 16 = -224 (center of bottom tile)
+        // Player should stand on floor tiles just above bottom wall at y = -224 + 32 = -192
+        let ground_level = -192.0;
+        if transform.translation.y <= ground_level {
+            transform.translation.y = ground_level;
             velocity.0.y = 0.0;
             *jump_state = JumpState::Grounded;
         }

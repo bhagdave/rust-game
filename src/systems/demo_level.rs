@@ -51,7 +51,7 @@ use crate::components::room::{Door, DoorState};
 
 // Import level data structures for loading demo level
 use crate::systems::level_loader::{EntitySpawn, LevelData};
-
+use crate::resources::input_config::default_input_map;
 use crate::resources::asset_handles::{AssetHandles, SpriteType};
 use crate::resources::game_state::{GameMode, GameState};
 
@@ -131,6 +131,7 @@ pub fn spawn_player(
                 ..default()
             },
             Transform::from_translation(position.extend(10.0)), // Z=10 to render above tilemap
+            default_input_map(),
         ))
         .id();
 
@@ -212,13 +213,20 @@ pub fn spawn_door(
         DoorState::Open => "Press E to enter".to_string(),
     };
 
-    // Get door sprite handle (fallback to default if not found)
-    // TODO: Use specific door sprite type once AssetHandles supports door variants
+    // Get door sprite handle - use player sprite as placeholder since we don't have door sprites yet
+    // For now, use DemoPlaceholder to make it visually distinct
     let sprite_handle = asset_handles
         .sprites
-        .get(&SpriteType::Player) // Placeholder - will use door sprite in future
+        .get(&SpriteType::DemoPlaceholder)
         .cloned()
-        .unwrap_or_default();
+        .unwrap_or_else(|| {
+            // Fallback to player if placeholder not loaded
+            asset_handles
+                .sprites
+                .get(&SpriteType::Player)
+                .cloned()
+                .unwrap_or_default()
+        });
 
     // Create object ID from entity type and position
     let object_id = format!(
@@ -226,8 +234,8 @@ pub fn spawn_door(
         entity_spawn.entity_type, entity_spawn.position.0, entity_spawn.position.1
     );
 
-    // Convert position tuple to Vec2
-    let position = Vec2::new(entity_spawn.position.0, entity_spawn.position.1);
+    // Convert position tuple to Vec2 and transform to world coordinates
+    let position = convert_level_to_world_coords(entity_spawn.position);
 
     // Spawn door entity with all required components
     let entity = commands
@@ -248,7 +256,8 @@ pub fn spawn_door(
         ))
         .id();
 
-    info!("Spawned door at position ({}, {})", position.x, position.y);
+    info!("Spawned door at world position ({}, {}) from level ({}, {})", 
+          position.x, position.y, entity_spawn.position.0, entity_spawn.position.1);
     entity
 }
 
@@ -335,13 +344,24 @@ pub fn spawn_item(
         Item::Key(key_type)
     };
 
-    // Get item sprite handle (fallback to default if not found)
-    // TODO: Use specific item sprite types once AssetHandles supports item variants
-    let sprite_handle = asset_handles
-        .sprites
-        .get(&SpriteType::Player) // Placeholder - will use item sprites in future
-        .cloned()
-        .unwrap_or_default();
+    // Get item sprite handle based on item type
+    let sprite_handle = match &item {
+        Item::Match => asset_handles
+            .sprites
+            .get(&SpriteType::Match)
+            .cloned()
+            .unwrap_or_default(),
+        Item::Key(key_type) => asset_handles
+            .sprites
+            .get(&SpriteType::Key(*key_type))
+            .cloned()
+            .unwrap_or_default(),
+        _ => asset_handles
+            .sprites
+            .get(&SpriteType::DemoPlaceholder)
+            .cloned()
+            .unwrap_or_default(),
+    };
 
     // Create object ID from entity type and position
     let object_id = format!(
@@ -349,8 +369,8 @@ pub fn spawn_item(
         entity_spawn.entity_type, entity_spawn.position.0, entity_spawn.position.1
     );
 
-    // Convert position tuple to Vec2
-    let position = Vec2::new(entity_spawn.position.0, entity_spawn.position.1);
+    // Convert position tuple to Vec2 and transform to world coordinates
+    let position = convert_level_to_world_coords(entity_spawn.position);
 
     // All items use the same interaction prompt
     let interaction_prompt = "Press E to collect".to_string();
@@ -381,10 +401,24 @@ pub fn spawn_item(
         .id();
 
     info!(
-        "Spawned {} at position ({}, {})",
-        item_name, position.x, position.y
+        "Spawned {} at world position ({}, {}) from level ({}, {})",
+        item_name, position.x, position.y, entity_spawn.position.0, entity_spawn.position.1
     );
     entity
+}
+
+/// Converts demo level coordinates to world coordinates.
+///
+/// The demo level uses 1920x1080 coordinate space with origin at top-left.
+/// World coordinates have origin at center (0, 0).
+/// This function converts from level space to world space.
+fn convert_level_to_world_coords(level_pos: (f32, f32)) -> Vec2 {
+    // Demo level is 1920x1080, so center is at (960, 540)
+    // Convert to centered coordinates: subtract half of level dimensions
+    Vec2::new(
+        level_pos.0 - 960.0,
+        -(level_pos.1 - 540.0), // Flip Y axis (level Y increases down, world Y increases up)
+    )
 }
 
 /// Spawns all entities from demo level data based on their types.
@@ -459,13 +493,13 @@ pub fn spawn_demo_entities(
     for entity_spawn in &level_data.entities {
         match entity_spawn.entity_type.as_str() {
             "PlayerSpawn" => {
-                // Spawn player at specified position
-                let position = Vec2::new(entity_spawn.position.0, entity_spawn.position.1);
+                // Convert level coordinates to world coordinates
+                let position = convert_level_to_world_coords(entity_spawn.position);
                 spawn_player(commands, position, asset_handles);
                 spawned_count += 1;
                 info!(
-                    "Spawned player at position ({:.0}, {:.0})",
-                    position.x, position.y
+                    "Spawned player at world position ({:.0}, {:.0}) from level ({:.0}, {:.0})",
+                    position.x, position.y, entity_spawn.position.0, entity_spawn.position.1
                 );
             }
             "Door" => {
@@ -630,10 +664,12 @@ fn spawn_demo_tilemap(commands: &mut Commands, level_data: &LevelData, asset_ser
     let tile_size = TilemapTileSize { x: 32.0, y: 32.0 };
     let map_type = TilemapType::Square;
 
-    // Center the tilemap at origin
+    // Position tilemap so that the center of the grid is at world origin (0, 0)
+    // Grid is 20x15 tiles of 32px each = 640x480 pixels
+    // Offset by half to center: -320, -240
     let transform = Transform::from_xyz(
-        -(map_width as f32 * 32.0) / 2.0,
-        -(map_height as f32 * 32.0) / 2.0,
+        -(map_width as f32 * 32.0) / 2.0,  // Center X
+        -(map_height as f32 * 32.0) / 2.0, // Center Y
         0.0,
     );
 
@@ -1190,10 +1226,11 @@ impl Plugin for DemoPlugin {
 /// - `GameState` resource and `GameMode` enum
 fn init_demo_system(mut commands: Commands, mut game_state: ResMut<GameState>) {
     // Spawn camera for the demo level (required to see anything in Bevy)
-    // Position camera at center of 1920x1080 level to see all entities
+    // Position camera at origin looking at the demo level
+    // Bevy 0.16 uses orthographic projection by default for Camera2d
     commands.spawn((
         Camera2d,
-        Transform::from_xyz(960.0, 540.0, 999.0), // Center of level, high Z to see everything
+        Transform::from_xyz(0.0, 0.0, 100.0), // Position camera above the scene
     ));
     info!("Spawned 2D camera for demo level");
 
